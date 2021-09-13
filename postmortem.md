@@ -143,7 +143,7 @@ When the game is in the playing state, the stars parallax scroll according to th
 
 Shadows didn't turn out to be as tricky to make work as I initially thought. Because my base assets are very dark, they could be used directly to draw shadows for specific actors (the player, and enemies).
 
-Shadows are always drawn for the player and enemies. Because the background is very dark and the stars very small, you really don't notice that the player and enemies are actually casting shadows on the starts.
+Shadows are always drawn for the player and enemies. Because the background is very dark and the stars very small, you really don't notice that the player and enemies are actually casting shadows on the stars.
 
 <br>
 
