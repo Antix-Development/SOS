@@ -1,7 +1,3 @@
-# *At this time, the postmortem is a W.I.P. I'll remove this once it is complete*
-
-<br>
-
 # SOS Postmortem
 
 After the theme for the 2021 js13k competition was announced as "Space" I came up with the idea of creating a top down civilization type game where the goal would be to advance from the stone age, through to the space age, and achieve space travel.
@@ -40,15 +36,15 @@ Earlier in the week I had been messing about with recoloring images using `getIm
 
 The asset generation code basically takes this image...
 
-![Base Assets](src/assets_base.png)
+![Base Assets](postmortem/assets_base.png)
 
 And uses it to create this image...
 
-![Composed Assets](src/assets_composed.png)
+![Composed Assets](postmortem/assets_composed.png)
 
 So how did I get from the first image to the second image? That's a very good question, and one I'll attempt to answer in a half coherent manner.
 
-At first glance it looks like the first image is a solid black image but it is in fact an 8 colored indexed PNG file drawn in 7 shades of blue (#000001 - #000006).
+At first glance it looks like the first image is a solid black image but it is in fact an 8 color indexed PNG file drawn in 7 shades of blue (#000001 - #000006).
 
 Using `ctx.getImageData(x, y, w, h)`, you can get an array of bytes containing all of the pixel information for a defined rectangle inside a context.
 
@@ -123,13 +119,14 @@ When it came to creating a particle system I knew that I would have to choose ca
 - Can be z-ordered.
 
 Eventually I fabricated some code that met all of my requirements in roughly 30 lines of JavaScript code. I consider this very good code and was really pleased that I managed to get animation over time implemented.
+
 <br>
 
 ## Procedurally generated backgrounds
 
 As mentioned previously, I already had all of the code required for this functionality created whilst working on the abandonned civilization prototype.
 
-Given more time I would have added some code to recolor the background tile-set between attack waves, but I was bogged down on the final day bug hunting and madly trying to get some other features implemented.
+Given more time I would have added some code to recolor the background tile-set between attack waves, but I was bogged down on the final day bug hunting and madly trying to get some other crucial features implemented.
 
 <br>
 
@@ -146,44 +143,81 @@ When the game is in the playing state, the stars parallax scroll according to th
 
 Shadows didn't turn out to be as tricky to make work as I initially thought. Because my base assets are very dark, they could be used directly to draw shadows for specific actors (the player, and enemies).
 
-Shadows are always drawn for the player and enemies. Because the background is very dark and the stars very small, you really don't notice that the player and enemies are casting shadows on the starts.
+Shadows are always drawn for the player and enemies. Because the background is very dark and the stars very small, you really don't notice that the player and enemies are actually casting shadows on the starts.
 
 <br>
 
 ## Sound effects
 
-A basic sound effect player that plays sounds created using Frank Force's awesome [ZzFX](https://killedbyapixel.github.io/ZzFX/).
+I used Frank Force's awesome [ZzFX](https://killedbyapixel.github.io/ZzFX/) to create the sound effects for SOS. This part of the SOS code-base is a heavily modified version of zzfx.js, part of ZzFX.
 
-This part of the SOS code-base is a heavily modified version of zzfx.js, part of ZzFX.
+The code comes from the module I made for my 2D game engine and once again the associative arrays had to be modified to use indexes.
+
+Given more time (I should have that as a t-shirt logo) I would have tweaked the sound effects more, and added a few more as well.
 
 <br>
 
 ## Increasing difficulty level, maxing out at a certain point
 
-TODO
+Difficulty scaling uses a simple quadratic easing algorithm, scaling enemy attributes from 0.5 to 1 over 10 waves, whereon all enemies are at their most dangerous.
+
+Scaled enemy attributes are their maximum movement speed, targeting range, and reloading duration.
+
+Aggressors do not have their attributes scaled, as they are designed to be deadly all the time.
 
 <br>
 
 ## Multiple enemies with simple AI
 
-TODO
+I designed seven different enemies for SOS...
+
+Enemy | Image | AI
+- | - | -
+Scout | ![Scout](postmortem/scout.png) | Scouts orbit the center of the game world at distances near the edge of the generated background. Scouts fire photons at the player when it is in range.
+Roamer | ![Roamer](postmortem/roamer.png) | Roamers rotate as they move and just bounce around the game world in radom directions. When the player is in range, roamers fire muons in a random direction.
+Bomber | ![Bomber](postmortem/bomber.png) | Bombers move between two generated waypoints. As they move, bombers randomly spawn mines.
+Mine | ![Mine](postmortem/mine.png) | Mines are spawned by bombers. They begin moving in a random direction and slow quickly to become stationary. After 10 seconds they self detonate.
+Carrier | ![Carrier](postmortem/carrier.png) | Carriers move very slowly towards the player. When the player is in range, and when the carrier is directly facing the player, cariers begin rapidly firing salvos of comets at the player. When a carrier is destroyed it releases a swarm.
+Swarmer | ![Swarmer](postmortem/swarmer.png) | Swarmers are spawned when carriers are destroyed. They home on the player quickly and are suicidalin their nature.
+Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range.
+
+Individually their AI is very simple, but when combined they present an interesting combat dynamic for the player.
+
+Overall I was very happy with the enemies, especially how they combine to wreck the player at higher difficulty settings.
 
 <br>
 
 ## Persistent high scores
 
 TODO
+The high scores are saved to local storage as com.antix.sos.s.
 
 <br>
 
 ## Persistent configurable options
 
-TODO
+Due to a little incompetence, this proved to be really difficult and in the end the code had some extraneous data in it.
+
+Since it was the final day of the competition and since I was well under the 13Kb limit, I wasn't overly worried about optimizing it. I was also quite busy bug hunting and play testing.
+
+From the options menu the player can enable and disable sound effects, and remap the controls. They can also reset the options to their defaults.
+
+The options are saved to local storage as com.antix.sos.o.
 
 <br>
 
 # Final thoughts
 
-TODO
+Participating in the js13k competition has been challenging and rewarding, and has really made me a better programmer (I think). I'm already looking forward to next years competition where I hope to create something even better than I managed to this time round.
 
-Having to rethink many different aspects of the project was a good learning experience
+Having to rethink many different aspects of the project was a good learning experience and I am sure that I will look at future programming problems from a different angle from now on.
+
+Overall I'm very pleased with what I managed to accomplish in one month on my own. Somehow I managed to produce most of a 2D game engine, half a civilization type game prototype, and a full feature shoot-em-up.
+
+As an aside, my partner Claire and I came to Rarotonga (a tropical paciic island) for a five week holiday at the end of July. Not long afterwards, New Zealand went into pandemic lock-down mode and we found ourselves here for much longer than we had planned.
+
+This being the case, I had to create all of this between lying on the beach, swimming, snorkeling, and taking advantage of eating out experiences. Quite frankly I don't know how I managed to get any coding done.
+
+So thanks for reading my postmortem and I hope that you can decipher a bit of my code and will maybe learn something new that you can leverage in your own projects.
+
+As always, I'm more than happy to try and explain anything you can't grasp, or where the code is just unreadable. In any case just drop me a line on antix.develpment@gmail.com
