@@ -9,7 +9,8 @@ I humbly apologize for the unreadableness of my code
 */
 
 // #region Remove for production
-// let log = (t) => {console.log(t);}; // REM
+let log = (t) => {console.log(t);}; // REM
+
 // #endregion
 
 // #region General purpose constants
@@ -31,6 +32,12 @@ RADTODEG  = 180 / PI,
 EVENODD = 'evenodd', // Such a  pathetic minimization effort :D
 
 FLASH_DURATION = 0.075, // Duration of flash when any given actor is flashing
+
+// #endregion
+
+// #region Debugging
+DEBUG = false,
+debugLabel,
 
 // #endregion
 
@@ -131,7 +138,10 @@ OUT = [], // List of "in-use" actors.
 // #endregion
 
 // #region Scene Rendering Variables
-ATLAS,
+
+TARGET, //The actor that the camera is currently tracking
+
+ATLAS, // The generated texture atlas
 
 CANVAS, // The main display canvas
 CTX, // Drawing context for main game display
@@ -1003,6 +1013,9 @@ getActor = (role = ROLE_NONE) => {
   actor.rR = 0; // Rotation rate
 
   actor.alive = false; // He was D.O.A sir :(
+
+  actor.T = null; // Actor has no target
+  
   
   actor.z = 1;
 
@@ -1470,7 +1483,7 @@ updateScout = (scout) => {
 targetCoordinatesNearPLayer = (actor, range = 40) => {
   let distance = range + rInt(range),
   angle = randomAngleRAD(); // Pick a random direction
-  actor.tD = {
+  actor.T = {
     x: PLAYER.x + cos(angle) * distance,
     y: PLAYER.y + sin(angle) * distance
   };
@@ -1575,6 +1588,8 @@ newEnemy = (type, x, y, a = 0) => {
       {x: MID_WORLD + cos(angle) * distance, y: MID_WORLD + sin(angle) * distance},
       {x: MID_WORLD + cos(angle + PI) * distance, y: MID_WORLD + sin(angle + PI) * distance}
     ];
+    enemy.T = enemy.tD[0];
+    enemy.T = enemy.tD[0];
     enemy.wT = 0; // Which target (0 or 1)
     enemy.sT = 5 + random() * 5; // Time till a new mine is spawned
 
@@ -1589,6 +1604,7 @@ newEnemy = (type, x, y, a = 0) => {
     // 
 
     randomizePosition(enemy); // Set random coordinates
+    enemy.T = PLAYER;
 
   } else if (type == ET_ROAMER) {
 
@@ -1599,13 +1615,8 @@ newEnemy = (type, x, y, a = 0) => {
     randomizePosition(enemy); // Set random coordinates
 
     a = randomAngleDEG(); // Pick a random direction
-    // a = random() * 360; // Pick a random direction
     setVelocities();
 
-    // let a = random() * 360;
-    // enemy.vX = cos(a * DEGTORAD) * 65;
-    // enemy.vY = sin(a * DEGTORAD) * 65;
-    // enemy.rot = random() * 360;
     (random() < 0.5) ? enemy.rR = 320 : enemy.rR = -320; // Set moving clockwise or counter-clockwise
 
   } else if (type == ET_MINE) {
@@ -1615,15 +1626,12 @@ newEnemy = (type, x, y, a = 0) => {
     // 
     enemy.mS = 400;
     setVelocities();
-    // enemy.vX = cos(a * DEGTORAD) * 400; // Set velocities
-    // enemy.vY = sin(a * DEGTORAD) * 400;
-    // moveInRandomDirection(enemy, 300);
-    // flashes(enemy);
     enemy.ttl = 10;
 
   } else if (type == ET_SWARMER) {
     setVelocities();
     enemy.rot = a;
+    enemy.T = PLAYER;
 
   } else if (type == ET_BULLET1) {
     setVelocities();
@@ -1651,7 +1659,6 @@ newEnemy = (type, x, y, a = 0) => {
     fx_play(FX_MISSILE);
 
   }
-
 },
 
 // Give a dog a bone ;)
@@ -2246,6 +2253,15 @@ keyUp = (e) => {
       paused = !paused; // Toggle paused state
       if (!paused) { // If false, then the game was resumed from a pause state
         lastFrame = Date.now() // Reset elapsed time since last EnterFrame event
+        TARGET = PLAYER;
+      }
+    } else if (k == 79) {
+      DEBUG = !DEBUG; // Toggle debug info mode
+      if (DEBUG) {
+
+        debugLabel = newTextField('', 4, 20);
+      } else {
+        freeActor(debugLabel);
       }
     }
 
@@ -2292,11 +2308,11 @@ keyUp = (e) => {
 // #region Enemy
 
 // Make the given actor steer and move towards the given target actor
-home = (actor, target) => {
+home = (actor) => {
   let diff,
   rot = actor.rot * DEGTORAD, // Get actor rotation
 
-  targetAngle = atan2(target.y - actor.y, target.x - actor.x); // Calculate angle to target coordinates
+  targetAngle = atan2(actor.T.y - actor.y, actor.T.x - actor.x); // Calculate angle to target coordinates
   
   if (rot != targetAngle) { // Is the actor already facing directly at the target?
     // No... steer towards the target
@@ -2521,6 +2537,36 @@ drawActor = (actor, shadow = false) => {
   
         CTX.rotate(DEGTORAD * rotation);
         drawMain(r[0] + actor.oX, r[1] + actor.oY, r[2], r[3], -actor.iR, -actor.iR);
+
+        if ((DEBUG) && (actor.r == ROLE_ENEMY)) { // Is debug enabled, AND is the actor an enemy?
+          if (actor.t <= ET_SWARMER) { // we only want actual enemies, not enemy bullets
+
+            CTX.lineWidth = 1;
+
+            if (actor.T) { // Current target
+
+              let a = atan2(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90; // Calculate angle to target coordinates
+              let d = distanceBetween(actor, actor.T);
+
+              CTX.strokeStyle = '#ff0';
+              CTX.beginPath();
+              CTX.moveTo(0, 0);
+              CTX.lineTo(cos(a * DEGTORAD) * d, sin(a * DEGTORAD) * d);
+              CTX.closePath();
+              CTX.stroke();
+            }
+
+            CTX.strokeStyle = '#08f'; // Collision Radius
+            CTX.beginPath();
+            CTX.arc(0, 0, actor.cR, 0, PI2);
+            CTX.stroke();
+            
+            CTX.strokeStyle = '#f00'; // Targeting range
+            CTX.beginPath();
+            CTX.arc(0, 0, actor.range, 0, PI2);
+            CTX.stroke();
+          }
+        }
 
       } else if (actor.r == ROLE_TEXTFIELD) {
 
@@ -2782,6 +2828,8 @@ onEnterFrame = () => {
                 lifeImage.oX = playerLife * 72; // Set atlas x offset
                 if (playerLife <= 0) {
 
+                  DEBUG = false; // Disable debug output
+
                   fx_play(FX_GAME_OVER);
 
                   showInfo(`Game Over`, () => {
@@ -2943,10 +2991,10 @@ onEnterFrame = () => {
           // 
           
           
-          home(actor, actor.tD); // Steer the actor towards the target coordinates and update velocity
+          home(actor); // Steer the actor towards the target coordinates and update velocity
           applyVelocities(actor); // Move it!
           
-          if (inRange(actor, actor.tD, 8)) targetCoordinatesNearPLayer(actor); // If the actor is "close" to the current target, create a new one
+          if (inRange(actor, actor.T, 8)) targetCoordinatesNearPLayer(actor); // If the actor is "close" to the current target, create a new one
           fire(actor, () => { // Fire at the player
             newEnemy(ET_MISSILE, actor.x, actor.y, atan2(PLAYER.y - actor.y, PLAYER.x - actor.x) * RADTODEG // Calculate angle to target coordinates
             );
@@ -2958,13 +3006,14 @@ onEnterFrame = () => {
           // Perform AI for ET_BOMBER enemy actors
           // 
 
-          let target = actor.tD[actor.wT % 2]; // Get the current target coordinates (0 or 1)
 
-          home(actor, target); // Steer the actor towards the target coordinates and update velocity
+          home(actor); // Steer the actor towards the target coordinates and update velocity
           moveAndConstrain(actor); // Move it!
           
-          if (inRange(actor, target, 8)) actor.wT ++; // If the actor is "close" to the current target, switch to the other target
+          if (inRange(actor, actor.T, 8)) actor.wT ++; // If the actor is "close" to the current target, switch to the other target
           
+          actor.T = actor.tD[actor.wT % 2]; // Get the current target coordinates (0 or 1)
+
           actor.sT -= DT; // Countdown till next mine is laid
           if (actor.sT <= 0) { // Can the actor spawn a new mine?
             actor.sT = 5 +random() * 5; // Reset spawn timer
@@ -2978,7 +3027,7 @@ onEnterFrame = () => {
           // Perform AI for ET_CARRIER enemy actors
           // 
 
-          home(actor, PLAYER); // Steer the carrier towards the target coordinates and update velocity
+          home(actor); // Steer the carrier towards the target coordinates and update velocity
           moveAndConstrain(actor); // Move it!
           if (actor.fT) { // Is the carrier directly facing the player?
             fire(actor, () => { // Fire at the player
@@ -3009,7 +3058,7 @@ onEnterFrame = () => {
           // Perform AI for ET_SWARMER enemy actors
           // 
 
-          home(actor, PLAYER); // Steer the actor towards the target coordinates and update velocity
+          home(actor); // Steer the actor towards the target coordinates and update velocity
           applyVelocities(actor);
 
         } else { // It must be ET_BULLET1, ET_BULLET2, and ET_BULLET3
@@ -3167,8 +3216,8 @@ onEnterFrame = () => {
     // 1 - Calculate the global and local world coordinates, centered about the actor that the camera is currently tracking
     // 
 
-    vL = floor(clamp(PLAYER.x - 128, 0, WORLD_SIZE - STAGE_SIZE)), // Get visible bounds of game world
-    vT = floor(clamp(PLAYER.y - 128, 0, WORLD_SIZE - STAGE_SIZE)),
+    vL = floor(clamp(TARGET.x - 128, 0, WORLD_SIZE - STAGE_SIZE)), // Get visible bounds of game world
+    vT = floor(clamp(TARGET.y - 128, 0, WORLD_SIZE - STAGE_SIZE)),
     vR = vL + STAGE_SIZE,
     vB = vT + STAGE_SIZE;
 
@@ -3275,10 +3324,11 @@ onEnterFrame = () => {
     }
   }
 
-  // if (doomLabel) {
-  //   doomLabel.l = `${OUT.length}`;
-  // }
-
+  if (DEBUG) {
+    debugLabel.label = `out:${OUT.length}`;
+  }
+  
+  
   requestAnimationFrame(onEnterFrame); // Request the next EnterFrame event
 };
 // #endregion
@@ -3364,6 +3414,8 @@ PLAYER.z = 5;
 PLAYER.cS = true;
 PLAYER.v = false;
 setTextureRegion(PLAYER, getTextureRegion(TR_PLAYER));
+
+TARGET = PLAYER; // Set the camera target
 
 // 
 // Install window resizing handler
