@@ -113,14 +113,14 @@ FX_HIT            = 19,
 // #endregion
 
 // #region Actor Roles
-ROLE_NONE         = 0, // Player does not collide with these
+ROLE_NONE         = 0, // Player does not collide with actors with the following roles
 ROLE_IMAGE        = 1,
 ROLE_TEXTFIELD    = 2,
 ROLE_BUTTON       = 3,
 ROLE_PARTICLE     = 4,
-ROLE_PLAYER       = 5, // Player coes not collide with its self
+ROLE_PLAYER       = 5, // Player does not collide with its self
 ROLE_BULLET       = 6, // Or its own projectiles
-ROLE_CITIZEN      = 7, // Player collides with these
+ROLE_CITIZEN      = 7, // Player collides with all actors with the following roles
 ROLE_ENEMY        = 8,
 // #endregion
 
@@ -929,11 +929,6 @@ doFlash = (actor) => {
     }
   }
 },
-// Set actor as an expiring actor
-// expires = (actor, ttl) => {
-//   actor.expires = true;
-//   actor.ttl = ttl;
-// },
 // Return true if the given actor is on-screen (visible to the player). NOTE: Iterating is actually faster than calling indexOf()??
 onScreen = (actor) => {
   for (let i = 0; i < renderList.length; i++) { // Check all actors
@@ -960,7 +955,7 @@ growPool = () => {
 resetPool = () => {
 
   // 
-  // It is easier to just recreate it, rather than reset all of the actors variables
+  // It is easier to just recreate it, rather than reset all of the actors variables. I also ran out of time at the end because of a bug that is related to actors not being reset correctly.
   // 
 
   IN = [];
