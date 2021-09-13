@@ -170,42 +170,6 @@ Aggressors do not have their attributes scaled, as they are designed to be deadl
 ## Multiple enemies with simple AI
 
 I designed seven different enemies for SOS, the Scout, Roamer, Bomber, Mine, Carrier, Swarmer, and Aggressor.
-<!-- 
-Apologies for my crappy tables.. Github markdown butchers the entire thing when they are all cmbined :(
-
-Enemy | Image | AI
------ | ----- | --
-Scout | ![Scout](postmortem/scout.png) | Scouts orbit the center of the game world at distances near the edge of the generated background. Scouts fire photons at the player when it is in range.
-
-
-Enemy | Image | AI
------ | ----- | --
-Roamer | ![Roamer](postmortem/roamer.png) | Roamers rotate as they move and just bounce around the game world in radom directions. When the player is in range, roamers fire muons in a random direction.
-
-
-Enemy | Image | AI
------ | ----- | --
-Bomber | ![Bomber](postmortem/bomber.png) | Bombers move between two generated waypoints. As they move, bombers randomly spawn mines.
-
-
-Enemy | Image | AI
------ | ----- | --
-Mine | ![Mine](postmortem/mine.png) | Mines are spawned by bombers. They begin moving in a random direction and slow quickly to become stationary. After 10 seconds they self detonate.
-
-
-Enemy | Image | AI
------ | ----- | --
-Carrier | ![Carrier](postmortem/carrier.png) | Carriers move very slowly towards the player. When the player is in range, and when the carrier is directly facing the player, cariers begin rapidly firing salvos of comets at the player. When a carrier is destroyed it releases a swarm.
-
-
-Enemy | Image | AI
------ | ----- | --
-Swarmer | ![Swarmer](postmortem/swarmer.png) | Swarmers are spawned when carriers are destroyed. They home on the player quickly and are suicidalin their nature.
-
-
-Enemy | Image | AI
------ | ----- | --
-Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range. -->
 
  <table>
   <tr>
@@ -308,11 +272,8 @@ Given more time (my new catch-phrase) I would..
 
 - Improve the background generator to use 8-bit bit-masking if the 13Kb size limit wouldn't be exceeded.
 
-As an aside, my partner Claire and I came to Rarotonga (a tropical paciic island) for a five week holiday at the end of July. Not long afterwards, New Zealand went into pandemic lock-down mode and we found ourselves here for much longer than we had planned.
 
-This being the case, I had to create all of this between lying on the beach, swimming, snorkeling, and taking advantage of eating out experiences. Quite frankly I don't know how I managed to get any coding done.
-
-So thanks for reading my postmortem and I hope that you can decipher a bit of my code and will maybe learn something new that you can leverage in your own projects.
+Anyhoo, thanks for reading my postmortem and I hope that you can decipher a bit of my code and will maybe learn something new that you can leverage in your own projects.
 
 As always, I'm more than happy to try and explain anything you can't grasp, or where the code is just unreadable. In any case just drop me a line on antix.develpment@gmail.com
 
