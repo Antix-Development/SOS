@@ -1,4 +1,4 @@
-# SOS
+# SOS - Extended code
 
 After the js13k competition ended, I messed about with the code some more.
 
