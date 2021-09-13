@@ -4,8 +4,6 @@
 
 SOS is my submission the 2021 [js13kGames](https://js13kgames.com) competition, where over a one month period you create a game based on a theme ("space" for 2021), and then you cram your entire game (code and assets) into a 13Kb zip file and submit it.
 
-<br>
-
 ## Introduction
 
 SOS is a retro shoot-em-up game using pixel art graphics, written in JavaScript, HTML, and CSS.
