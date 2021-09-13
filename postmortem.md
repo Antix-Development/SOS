@@ -44,6 +44,7 @@ The asset generation code basically takes this image...
 ![Base Assets](src/assets_base.png)
 
 And uses it to create this image...
+
 ![Composed Assets](src/assets_composed.png)
 
 So how did I get from the first image to the second image? That's a very good question, and one I'll attempt to answer in a half coherent manner.
