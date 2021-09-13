@@ -175,6 +175,9 @@ Enemy | Image | AI
 ----- | ----- | --
 Scout | ![Scout](postmortem/scout.png) | Scouts orbit the center of the game world at distances near the edge of the generated background. Scouts fire photons at the player when it is in range.
 
+
+  |  |
+----- | ----- | --
 Roamer | ![Roamer](postmortem/roamer.png) | Roamers rotate as they move and just bounce around the game world in radom directions. When the player is in range, roamers fire muons in a random direction.
 
 Bomber | ![Bomber](postmortem/bomber.png) | Bombers move between two generated waypoints. As they move, bombers randomly spawn mines.
