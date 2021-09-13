@@ -178,6 +178,7 @@ Scout | ![Scout](postmortem/scout.png) | Scouts orbit the center of the game wor
 Roamer | ![Roamer](postmortem/roamer.png) | Roamers rotate as they move and just bounce around the game world in radom directions. When the player is in range, roamers fire muons in a random direction.
 
 Bomber | ![Bomber](postmortem/bomber.png) | Bombers move between two generated waypoints. As they move, bombers randomly spawn mines.
+
 Mine | ![Mine](postmortem/mine.png) | Mines are spawned by bombers. They begin moving in a random direction and slow quickly to become stationary. After 10 seconds they self detonate.
 
 Carrier | ![Carrier](postmortem/carrier.png) | Carriers move very slowly towards the player. When the player is in range, and when the carrier is directly facing the player, cariers begin rapidly firing salvos of comets at the player. When a carrier is destroyed it releases a swarm.
