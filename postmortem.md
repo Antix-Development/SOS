@@ -189,7 +189,8 @@ Overall I was very happy with the enemies, especially how they combine to wreck 
 
 ## Persistent high scores
 
-TODO
+I was happy with the high score system I came up with, but it would have been better to maybe make the scores larger on the high score menu and also add some effects like twinkling or something (a bit like the logo has on the main menu).
+
 The high scores are saved to local storage as com.antix.sos.s.
 
 <br>
@@ -213,6 +214,20 @@ Participating in the js13k competition has been challenging and rewarding, and h
 Having to rethink many different aspects of the project was a good learning experience and I am sure that I will look at future programming problems from a different angle from now on.
 
 Overall I'm very pleased with what I managed to accomplish in one month on my own. Somehow I managed to produce most of a 2D game engine, half a civilization type game prototype, and a full feature shoot-em-up.
+
+Given more time (my new catch-phrase) I would..
+
+- Improve the particle system to include emitters, be able to fade in and scale in, and have gravity effects.
+
+- Tweak the enemy attributes and difficulty scaling.
+
+- Tweak existing sound effects and add new ones, especially for highscore achievement.
+
+- Add a few more visual effects like smoke trails for missiles and the like.
+
+- Implement some really cheap and nasty procedurally generated music.
+
+- Improve the background generator to use 8-bit bit-masking if the 13Kb size limit wouldn't be exceeded.
 
 As an aside, my partner Claire and I came to Rarotonga (a tropical paciic island) for a five week holiday at the end of July. Not long afterwards, New Zealand went into pandemic lock-down mode and we found ourselves here for much longer than we had planned.
 
