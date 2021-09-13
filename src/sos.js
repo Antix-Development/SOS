@@ -34,44 +34,39 @@ FLASH_DURATION = 0.075, // Duration of flash when any given actor is flashing
 
 // #endregion
 
-// #region Miscellaneous Variables
+// #region Menus
+NAMESPACE = 'com.antix.sos.', // Namespace for localstorage operations
 
-scale,
+OPTIONS,
+optionsChanged, // True if the player changed an option
+optionsMenu,
 
-CONTROL_LEFT = 0,
+audioEnabledButton,
+
+awaitingControlKey = false, // True if waiting for the player to press a key to remap a control
+controlIndex, // Index of the control that is being changed
+
+CONTROL_LEFT = 0, // Values for controlIndex
 CONTROL_RIGHT = 1,
 CONTROL_THRUST = 2,
 CONTROL_FIRE = 3,
 
-// #endregion
-
-// #region Menus
-NAMESPACE = 'com.antix.sos.',
-optionsChanged,
-OPTIONS,
-optionsMenu,
-
-awaitingControlKey = false,
-controlIndex,
-
-controlLeftButton,
+controlLeftButton, //Button pointers
 controlRightutton,
 controlThrustButton,
 controlFireButton,
 controlButton,
 
 mainMenu,
-label,
 
-// #endregion
-
-// #region High Scores
 SCORES,
 scoreTiteLabel, // The title of the high scores menu
 newScoreLabel, // The name that the player is entering
 newScore, // The score that was most recently added to the list of high scores
 enteringName = false, // True if the player is entering a name on the high score menu
 newHigh,
+
+label,
 
 // #endregion
 
@@ -93,9 +88,6 @@ RIGHTEDGE = WORLD_SIZE - 128,
 // #endregion
 
 // #region Sound Effect Variables
-
-audioEnabledButton,
-
 // Indexes into the fX array for playing that particular sound effect
 FX_NONE           = 0,
 FX_THRUST         = 1,
@@ -726,7 +718,7 @@ randomAngleRAD = () => {
 },
 // Rescale the display
 rescale = () => {
-  scale = min(W.innerWidth / STAGE_SIZE, W.innerHeight / STAGE_SIZE); // Calculate scalar
+  let scale = min(W.innerWidth / STAGE_SIZE, W.innerHeight / STAGE_SIZE); // Calculate scalar
   D.body.style.transform = 'scale(' + scale + ')'; // Scale the canvas
   D.body.style.paddingLeft = floor(((W.innerWidth - CANVAS.getBoundingClientRect().width) / 2) / scale) + 'px'; // Center the canvas on the x-axis
 },
@@ -1976,7 +1968,7 @@ mainMenu = () => {
     fx_play(FX_WAVE_BEGIN);
     transition(1, () => { // Execute this code when the scene has transtioned out
       BUTTONS = [];
-      WAVE = 10; // Reset the attack wave
+      WAVE = 0; // Reset the attack wave
       playerScore = 0; // Reset the players score
 
       starColors = starPalettes[0]; // Set ingame star colors
@@ -2788,7 +2780,7 @@ onEnterFrame = () => {
 
                 // While the player is flashing, they can not be damaged
 
-                // playerLife --; // Subtract life
+                playerLife --; // Subtract life
 
                 fx_play(FX_HIT);
                 
