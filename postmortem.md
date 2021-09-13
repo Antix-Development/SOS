@@ -36,7 +36,7 @@ So how did I do? Good question. Let's find out.
 
 ## Colorful pixel-art
 
-Earlier in the week I had been messing about with recoloring images using `getImageData()` and 'putImageData()' and I spent a few days getting that code into shape and integrated in the main code-base. It really ended up working so much better than I expected, and it was around this time that I also got the mad idea to basically render a large logo for the game using canvas line drawing and gradient fills. Once implemented, it was really spectacular, and comparing the code required vs having an actual image for the logo, it shaved 1601 bytes from the final zip file!
+Earlier in the week I had been messing about with recoloring images using `getImageData()` and `putImageData()` and I spent a few days getting that code into shape and integrated in the main code-base. It really ended up working so much better than I expected, and it was around this time that I also got the mad idea to basically render a large logo for the game using canvas line drawing and gradient fills. Once implemented, it was really spectacular, and comparing the code required vs having an actual image for the logo, it shaved 1601 bytes from the final zip file!
 
 The asset generation code basically takes this image...
 
@@ -52,11 +52,11 @@ At first glance it looks like the first image is a solid black image but it is i
 
 Using `ctx.getImageData(x, y, w, h)`, you can get an array of bytes containing all of the pixel information for a defined rectangle inside a context.
 
-These bytes can then have their red, green, and blue values remapped using indexed color palettes, and then written back to the same context using `ctx.putImageData(imageData, x, y).
+These bytes can then have their red, green, and blue values remapped using indexed color palettes, and then written back to the same context using `ctx.putImageData(imageData, x, y)`.
 
 As I experimented with this it was annoying that I kept getting errors relating to `tainted canvases`, a really frustrating cross-origin web browser security feature.
 
-Fortunately I discovered that if an image is embedded directly into an HTML file as a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs), canvasses no longer become tainted when using `getImageData()` and `putImageData()`. It was also pleasantly suprising to find that my MIME encoded image (encoded using [Base64 Image](https://www.base64-image.de)) produced a smaller zip file than when I had the image stored as a normal PNG file. Go figure.
+Fortunately I discovered that if an image is embedded directly into an HTML file as a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs), canvasses are no longer considered tainted when using `getImageData()` and `putImageData()`. It was also pleasantly suprising to find that my MIME encoded image (encoded using [Base64 Image](https://www.base64-image.de)) produced a smaller zip file than when I had the image stored as a normal PNG file. Go figure.
 
 All graphical assets in SOS are stored in one large image called a `Texture Atlas`. There is an array of `Texture Regions` that define bounds of sub-images contained within the atlas.
 
@@ -69,7 +69,7 @@ For my 2D game engine I created an `Actor` class which had getters, setters, and
 
 Both Closure Compiler and UglifyJS would not mangle object properties correctly, so I found that I had to abbreviate many of the actors properties, making the code all that much harder to read (for the unfamiliar reader).
 
-The `Actor` became just an object, with all the class code removed. In this state it became the "thing" that was used for everything (payer, enemies, bullets, particles, buttons, etc). It was actually a very versitile "thing" in the end.
+The `Actor` became just an object, with all the class code removed. In this state it became the "thing" that was used for everything (player, enemies, bullets, particles, buttons, etc). It was actually a very versitile "thing" in the end.
 
 <!-- Actors are created by calling `getActor(role)` where role is one of the following..
 ```javascript
