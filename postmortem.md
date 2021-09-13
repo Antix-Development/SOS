@@ -170,7 +170,7 @@ Aggressors do not have their attributes scaled, as they are designed to be deadl
 ## Multiple enemies with simple AI
 
 I designed seven different enemies for SOS, the Scout, Roamer, Bomber, Mine, Carrier, Swarmer, and Aggressor.
-
+<!-- 
 Apologies for my crappy tables.. Github markdown butchers the entire thing when they are all cmbined :(
 
 Enemy | Image | AI
@@ -205,7 +205,58 @@ Swarmer | ![Swarmer](postmortem/swarmer.png) | Swarmers are spawned when carrier
 
 Enemy | Image | AI
 ----- | ----- | --
-Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range.
+Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range. -->
+
+ <table>
+  <tr>
+    <th>Enemy</th>
+    <th>Image</th>
+    <th>AI</th>
+  </tr>
+
+  <tr>
+    <td>Scout</td>
+    <td><img src="postmortem/scout.png"></td>
+    <td>Scouts orbit the center of the game world at distances near the edge of the generated background. Scouts fire photons at the player when it is in range.</td>
+  </tr>
+
+  <tr>
+    <td>Roamer</td>
+    <td><img src="postmortem/roamer.png"></td>
+    <td>Roamers rotate as they move and just bounce around the game world in radom directions. When the player is in range, roamers fire muons in a random direction.</td>
+  </tr>
+
+  <tr>
+    <td>Bomber</td>
+    <td><img src="postmortem/bomber.png"></td>
+    <td>Bombers move between two generated waypoints. As they move, bombers randomly spawn mines.</td>
+  </tr>
+
+  <tr>
+    <td>Mine</td>
+    <td><img src="postmortem/mine.png"></td>
+    <td>Mines are spawned by bombers. They begin moving in a random direction and slow quickly to become stationary. After 10 seconds they self detonate.</td>
+  </tr>
+
+  <tr>
+    <td>Carrier</td>
+    <td><img src="postmortem/carrier.png"></td>
+    <td>Carriers move very slowly towards the player. When the player is in range, and when the carrier is directly facing the player, cariers begin rapidly firing salvos of comets at the player. When a carrier is destroyed it releases a swarm.</td>
+  </tr>
+
+  <tr>
+    <td>Swarmer</td>
+    <td><img src="postmortem/swarmer.png"></td>
+    <td>Swarmers are spawned when carriers are destroyed. They home on the player quickly and are suicidalin their nature.</td>
+  </tr>
+  <tr>
+    <td>Aggressor</td>
+    <td><img src="postmortem/aggressor.png"></td>
+    <td>After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range.</td>
+  </tr>
+
+</table> 
+
 
 Individually their AI is very simple, but when combined they present an interesting combat dynamic for the player.
 
@@ -264,3 +315,4 @@ This being the case, I had to create all of this between lying on the beach, swi
 So thanks for reading my postmortem and I hope that you can decipher a bit of my code and will maybe learn something new that you can leverage in your own projects.
 
 As always, I'm more than happy to try and explain anything you can't grasp, or where the code is just unreadable. In any case just drop me a line on antix.develpment@gmail.com
+
