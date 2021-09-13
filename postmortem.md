@@ -42,6 +42,8 @@ And uses it to create this image...
 
 ![Composed Assets](postmortem/assets_composed.png)
 
+NOTE: The images above have a grey background just to make them stand out from githubs white background.
+
 So how did I get from the first image to the second image? That's a very good question, and one I'll attempt to answer in a half coherent manner.
 
 At first glance it looks like the first image is a solid black image but it is in fact an 8 color indexed PNG file drawn in 7 shades of blue (#000001 - #000006).
