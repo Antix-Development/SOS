@@ -216,42 +216,42 @@ Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressor
 
   <tr>
     <td>Scout</td>
-    <td><img src="postmortem/scout.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/scout.png"></td>
     <td>Scouts orbit the center of the game world at distances near the edge of the generated background. Scouts fire photons at the player when it is in range.</td>
   </tr>
 
   <tr>
     <td>Roamer</td>
-    <td><img src="postmortem/roamer.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/roamer.png"></td>
     <td>Roamers rotate as they move and just bounce around the game world in radom directions. When the player is in range, roamers fire muons in a random direction.</td>
   </tr>
 
   <tr>
     <td>Bomber</td>
-    <td><img src="postmortem/bomber.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/bomber.png"></td>
     <td>Bombers move between two generated waypoints. As they move, bombers randomly spawn mines.</td>
   </tr>
 
   <tr>
     <td>Mine</td>
-    <td><img src="postmortem/mine.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/mine.png"></td>
     <td>Mines are spawned by bombers. They begin moving in a random direction and slow quickly to become stationary. After 10 seconds they self detonate.</td>
   </tr>
 
   <tr>
     <td>Carrier</td>
-    <td><img src="postmortem/carrier.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/carrier.png"></td>
     <td>Carriers move very slowly towards the player. When the player is in range, and when the carrier is directly facing the player, cariers begin rapidly firing salvos of comets at the player. When a carrier is destroyed it releases a swarm.</td>
   </tr>
 
   <tr>
     <td>Swarmer</td>
-    <td><img src="postmortem/swarmer.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/swarmer.png"></td>
     <td>Swarmers are spawned when carriers are destroyed. They home on the player quickly and are suicidalin their nature.</td>
   </tr>
   <tr>
     <td>Aggressor</td>
-    <td><img src="postmortem/aggressor.png"></td>
+    <td style="width: 135px;text-align:center;"><img src="postmortem/aggressor.png"></td>
     <td>After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range.</td>
   </tr>
 
