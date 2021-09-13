@@ -216,7 +216,7 @@ Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressor
 
   <tr>
     <td>Scout</td>
-    <td style="width: 135px;text-align:center;"><img src="postmortem/scout.png"></td>
+    <td style="width: 135px;text-align:center;"><img style="width:64px;" src="postmortem/scout.png"></td>
     <td>Scouts orbit the center of the game world at distances near the edge of the generated background. Scouts fire photons at the player when it is in range.</td>
   </tr>
 
@@ -251,7 +251,7 @@ Aggressor | ![Aggressor](postmortem/aggressor.png) | After one minute, Aggressor
   </tr>
   <tr>
     <td>Aggressor</td>
-    <td style="width: 135px;text-align:center;"><img src="postmortem/aggressor.png"></td>
+    <td style="width: 135px;text-align:center;"><img style="width:128px;" src="postmortem/aggressor.png"></td>
     <td>After one minute, Aggressors begin spawning every 5 seconds. Aggressors home on random positions around the player and fire missiles at the player when it is in range.</td>
   </tr>
 
