@@ -4,7 +4,7 @@ After the theme for the 2021 js13k competition was announced as "Space" I came u
 
 I had spent some time (before the competition began) evaluating candidate game engines to use for my entry but after they all came up short in one way or another, I decided to write my own 2D game engine in JavaScript.
 
-About a week into the competition I had a pretty solid start on my engine but it was soon obvious that the large scope that a full feature game engine would not work with the js13k size limits. Fro this point on I just mashed the appropriate parts of the engine into my main code-base.
+About a week into the competition I had a pretty solid start on my engine but it was soon obvious that the large scope and size of a full feature game engine would not work with the js13k size limits. Fro this point on I just mashed the appropriate parts of the engine into my main code-base.
 
 Around the middle of week 2 I had designed the majority of my game and had created some code to procedurally generate circular game worlds using [cellular Automaton](https://en.wikipedia.org/wiki/Cellular_automaton) and [bit-masking](https://web.archive.org/web/20110714085421/http://www.angryfishstudios.com/2011/04/adventures-in-bitmasking/). After I began implementing mechanics and so forth it dawned on me that there was no way I would be able to cram all of the graphical assets required for such a game into a 13Kb zip file, even with on the fly recoloring of imagery inside the game.
 
@@ -220,6 +220,8 @@ Given more time (my new catch-phrase) I would..
 - Improve the particle system to include emitters, be able to fade in and scale in, and have gravity effects.
 
 - Tweak the enemy attributes and difficulty scaling.
+
+- Improve citizen placement so they aren't so "clumpy".
 
 - Tweak existing sound effects and add new ones, especially for highscore achievement.
 
