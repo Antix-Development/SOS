@@ -274,6 +274,9 @@ Given more time (my new catch-phrase) I would..
 
 - Improve the background generator to use 8-bit bit-masking if the 13Kb size limit wouldn't be exceeded.
 
+- Generate a wider variety of 3-patch buttons.
+
+- Enhance the `textField` actor to handle scaled rendering and possibly multiple lines.
 
 Anyhoo, thanks for reading my postmortem and I hope that you can decipher a bit of my code and will maybe learn something new that you can leverage in your own projects.
 
