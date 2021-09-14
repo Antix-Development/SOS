@@ -1975,6 +1975,8 @@ mainMenu = () => {
 
       starColors = starPalettes[0]; // Set ingame star colors
 
+      enteringName = false;
+      
       nextWave(); // Start the next attack wave
     });
   });
@@ -2308,7 +2310,7 @@ keyUp = (e) => {
 // #region Enemy
 
 // Make the given actor steer and move towards the given target actor
-home = (actor) => {
+seek = (actor) => {
   let diff,
   rot = actor.rot * DEGTORAD, // Get actor rotation
 
@@ -2991,7 +2993,7 @@ onEnterFrame = () => {
           // 
           
           
-          home(actor); // Steer the actor towards the target coordinates and update velocity
+          seek(actor); // Steer the actor towards the target coordinates and update velocity
           applyVelocities(actor); // Move it!
           
           if (inRange(actor, actor.T, 8)) targetCoordinatesNearPLayer(actor); // If the actor is "close" to the current target, create a new one
@@ -3007,7 +3009,7 @@ onEnterFrame = () => {
           // 
 
 
-          home(actor); // Steer the actor towards the target coordinates and update velocity
+          seek(actor); // Steer the actor towards the target coordinates and update velocity
           moveAndConstrain(actor); // Move it!
           
           if (inRange(actor, actor.T, 8)) actor.wT ++; // If the actor is "close" to the current target, switch to the other target
@@ -3027,7 +3029,7 @@ onEnterFrame = () => {
           // Perform AI for ET_CARRIER enemy actors
           // 
 
-          home(actor); // Steer the carrier towards the target coordinates and update velocity
+          seek(actor); // Steer the carrier towards the target coordinates and update velocity
           moveAndConstrain(actor); // Move it!
           if (actor.fT) { // Is the carrier directly facing the player?
             fire(actor, () => { // Fire at the player
@@ -3058,7 +3060,7 @@ onEnterFrame = () => {
           // Perform AI for ET_SWARMER enemy actors
           // 
 
-          home(actor); // Steer the actor towards the target coordinates and update velocity
+          seek(actor); // Steer the actor towards the target coordinates and update velocity
           applyVelocities(actor);
 
         } else { // It must be ET_BULLET1, ET_BULLET2, and ET_BULLET3
@@ -3129,8 +3131,6 @@ onEnterFrame = () => {
       // Perform actions common to all actors
       // 
 
-      //doFlash(actor); // Flash the actor if it is flashing
-    
       actor.rot += actor.rR * DT; // Update rotation
     }
 
