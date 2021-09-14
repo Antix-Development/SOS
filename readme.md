@@ -2,7 +2,7 @@
 
 # SOS
 
-<p style="text-align: center;"><img src="postmortem/screenshot.png"></p>
+<p align="center"><img src="postmortem/screenshot.png"></p>
 
 
 <table width="100%">
