@@ -1,3 +1,5 @@
+<div align="justify">
+
 # SOS Postmortem
 
 After the theme for the 2021 js13k competition was announced as "Space" I came up with the idea of creating a top down civilization type game where the goal would be to advance from the stone age, through to the space age, and achieve space travel.
@@ -282,3 +284,4 @@ Anyhoo, thanks for reading my postmortem and I hope that you can decipher a bit 
 
 As always, I'm more than happy to try and explain anything you can't grasp, or where the code is just unreadable. In any case just drop me a line on antix.develpment@gmail.com
 
+</div>

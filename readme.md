@@ -1,4 +1,4 @@
-<div style='text-align: justify;'>
+<div align="justify">
 
 # SOS
 
@@ -63,3 +63,5 @@ Base graphical assets were both sourced from [Open Game Art](https://opengameart
 First and foremost I must humbly apologize for the state of the SOS code-base. Due to the limitations imposed by the js13k competition, it became kind of messy and not very easy to read quite quickly.
 
 On the plus side, I'm always more than happy to answer any questions you might have regarding the code, just drop me a line at antix.development@gmail.com :)
+
+</div>
