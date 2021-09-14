@@ -1819,6 +1819,7 @@ mainMenuButton = () => {
     if (newHigh) { // Was there a new high score?
       saveScores(); // Save high scores
       newHigh = false; // Set state to no new high score
+      enteringName = false // Not entering a name
     }
     helpImages = []; // Clear help images
     controlsChanged = false;
@@ -1873,7 +1874,13 @@ helpMenu = () => {
 scoresMenu = () => {
   logoImage = null;
 
-  (newHigh) ? label = 'New High.. Enter Your Name' : label = HIGH_SCORE_LABEL;
+  label = HIGH_SCORE_LABEL;
+  if (newHigh) {
+    enteringName = true;
+    label = 'New High.. Enter Your Name';
+  }
+  
+  // (newHigh) ? label = 'New High.. Enter Your Name' : label = HIGH_SCORE_LABEL;
 
   scoreTiteLabel = newCenteredTextField(label, 25, 3)
 
@@ -1887,7 +1894,6 @@ scoresMenu = () => {
   }
   mainMenuButton();
 
-  enteringName = true;
   showMenu();
 };
 // Stop sparkles spawning
@@ -1975,8 +1981,6 @@ mainMenu = () => {
 
       starColors = starPalettes[0]; // Set ingame star colors
 
-      enteringName = false;
-      
       nextWave(); // Start the next attack wave
     });
   });

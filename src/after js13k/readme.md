@@ -13,7 +13,12 @@ After the js13k competition ended, I messed about with the code some more.
 
 - `home()` was renamed to `seek()` which is a more appropriate name. `seek()` now takes jut one parameter `actor` to correspond with the actor now having a dedicated target attribute.
 
-- Discovered a bug when the player dies.
- When entering game over mode, `enteringName` is not defined so 'keyUp()' throws a console error. Set `enteringName` to `false` when initiating a new game which resolved it.
+- Discovered a bug when the player dies (`Uncaught TypeError: Cannot read properties of undefined (reading 'n') at keyUp (sos.js:2274)`). The issue was that on entering game over mode, `enteringName` is not defined so 'keyUp()' throws a console error. Set `enteringName` to `false` when initiating a new game which resolved it.
+
+These fixes and additions take the zip file up to 13,227 bytes, not far from the maximum allowed for js13k. I'll try to manually mangle some object attributes and see if I can;t get that size down a l,ittle.
+
+After minifying with Terser, I ran the code through RoadRoller. Whilst the game was fine in FireFox, The UI elements flickered a few times in Chrome before disappearing totally. That's a shame because when zipped the whole thing is only 11,886 bytes.
+
+It might be worth investigating whay it fails so terribly in Chrome as I think I could do quite a lot with an extra 1426 bytes ;)
 
 </div>
