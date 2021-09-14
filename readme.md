@@ -4,6 +4,13 @@
 
 <p style="text-align: center;"><img src="postmortem/screenshot.png"></p>
 
+
+<table width="100%">
+  <tr>
+    <td style="text-align:center;"><img src="postmortem/scout.png"></td>
+  </tr>
+  </table>
+
 <br>
 SOS is my submission the 2021 [js13kGames](https://js13kgames.com) competition, where over a one month period you create a game based on a theme ("space" for 2021), and then you cram your entire game (code and assets) into a 13Kb zip file and submit it.
 
