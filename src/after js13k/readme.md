@@ -21,4 +21,11 @@ After minifying with Terser, I ran the code through RoadRoller. Whilst the game 
 
 It might be worth investigating whay it fails so terribly in Chrome as I think I could do quite a lot with an extra 1426 bytes ;)
 
+**14/9/2021**
+
+- Replaced all `false` and `true` occurrences with 0's and 1's.
+
+- Replaced the actors single `iR` (imageRadius) variable with `rX` (radiusX) and `rY` (radiusY) to better accomodate rectangular images.
+
+I've now decided to now shelve SOS and work on my 2D gaming engine since there is no requirement to be creating tiny code for now. I'm really looking forward to js13k competition 2022 however, see you all there!
 </div>

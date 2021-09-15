@@ -9,8 +9,7 @@ I humbly apologize for the unreadableness of my code
 */
 
 // #region Remove for production
-let log = (t) => {console.log(t);}; // REM
-
+// let log = (t) => {console.log(t);}; // REM
 // #endregion
 
 // #region General purpose constants
@@ -36,7 +35,7 @@ FLASH_DURATION = 0.075, // Duration of flash when any given actor is flashing
 // #endregion
 
 // #region Debugging
-DEBUG = false,
+DEBUG= 0,
 debugLabel,
 
 // #endregion
@@ -50,7 +49,7 @@ optionsMenu,
 
 audioEnabledButton,
 
-awaitingControlKey = false, // True if waiting for the player to press a key to remap a control
+awaitingControlKey= 0, // True if waiting for the player to press a key to remap a control
 controlIndex, // Index of the control that is being changed
 
 CONTROL_LEFT = 0, // Values for controlIndex
@@ -70,7 +69,7 @@ SCORES,
 scoreTiteLabel, // The title of the high scores menu
 newScoreLabel, // The name that the player is entering
 newScore, // The score that was most recently added to the list of high scores
-enteringName = false, // True if the player is entering a name on the high score menu
+enteringName= 0, // True if the player is entering a name on the high score menu
 newHigh,
 
 label,
@@ -120,8 +119,7 @@ FX_HIT            = 19,
 // #endregion
 
 // #region Actor Roles
-ROLE_NONE         = 0, // Player does not collide with actors with the following roles
-ROLE_IMAGE        = 1,
+ROLE_IMAGE        = 1, // Player does not collide with actors with the following roles
 ROLE_TEXTFIELD    = 2,
 ROLE_BUTTON       = 3,
 ROLE_PARTICLE     = 4,
@@ -154,23 +152,23 @@ renderList = [], // List of actors that will be drawn in the current frame
 
 // #region Collision Variables
 collisionList = [], // List of actors that can be colliding next frame
-collisionEnabled = false,
+collisionEnabled= 0,
 // #endregion
 
 // #region Game State variables
 DT, // Milliseconds elapsed since last EnterFrame event
 thisFrame, // Date of current EnterFrame event
 lastFrame, // Date of last EnterFrame event
-paused = false, // True if the application is in the paused state (where enemy and bullet AI is suspended)
+paused= 0, // True if the application is in the paused state (where enemy and bullet AI is suspended)
 
-keysEnabled = false, // True to enable keyboard input
-cursorVisible = true, // True if the pointer is visible
+keysEnabled= 0, // True to enable keyboard input
+cursorVisible = 1, // True if the pointer is visible
 
 transitionAlpha = 1,
-transitioningIn = false,
-transitioning = false, // True if fading scene in or out
+transitioningIn= 0,
+transitioning= 0, // True if fading scene in or out
 onTransitionComplete = null,
-aiEnabled = false, // True if enemy and bullet actors can update their states
+aiEnabled= 0, // True if enemy and bullet actors can update their states
 // #endregion
 
 // #region User Interface Variables
@@ -180,7 +178,7 @@ ON_LABEL = 'Enabled',
 OFF_LABEL = "Disabled",
 
 BUTTONS = [], // List of buttons that can be clicked
-ui_locked = true,
+ui_locked = 1,
 ui_selected = null, // Widget that was most recently clicked on
 ui_fontX = 32, // Coordinates of the font inside the main texture atlas
 ui_fontY = 96,
@@ -209,14 +207,14 @@ PLAYER_BULLET_TTL = .75,
 PLAYER_MAX_LIFE = 9,
 
 PLAYER, // The player!!!
-playerRotating = false, // True if the player is rotating
-playerThrusting = false, // True if the player is applying an thrust impulse in the direction it is facing
+playerRotating= 0, // True if the player is rotating
+playerThrusting= 0, // True if the player is applying an thrust impulse in the direction it is facing
 playerThrustDelay = 0, // counter to stop too many particles being generated
 playerReloadCounter = 0, // Countdown till player able to fire again
-playerCanFire = false, // True of the player can fire
-playerFiring = false, // True if the SPACE key is being held
+playerCanFire= 0, // True of the player can fire
+playerFiring= 0, // True if the SPACE key is being held
 playerScore, // Player score
-playerScoreChanged = false, // If true, the player score label will be updated this frame
+playerScoreChanged= 0, // If true, the player score label will be updated this frame
 scoreLabel, // HUD element showing player score
 playerLife, // How much life the player has. When life reaches zero... it's game over baby!
 lifeImage, // HUD element showing life remaining
@@ -238,7 +236,7 @@ starCounter = 0, // Stars change colors (in menus) when this goes below 0
 // #region Attack Wave variables
 WAVE, // Attack wave
 waveScalar, // Multiplier for scaling enemy difficulty
-infoVisible = false, // True when showing the info label
+infoVisible= 0, // True when showing the info label
 infoCounter, // Countdown till the info is done
 infoLabel, // Info label to display messages to the player
 infoCallback, // When infoCounter expires, run this code
@@ -461,8 +459,6 @@ ET_MISSILE        = 10,
 
 // #region Enemy Attributes
 
-nada = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
-
 // Enemy attribute indexes
 EA_TEXTURE_REGION   = 0,
 EA_COLLISION_RADIUS = 1,
@@ -633,24 +629,24 @@ WD_ROAMER_COUNT     = 4,
 waveData = [
   [ // 0
     3,  // Citizens
-    4, // Scouts
+    4,  // Scouts
     3,  // Bombers
     1,  // Carriers
-    5  // Roamers
+    5   // Roamers
   ],
 
   [ // 1
     4,  // Citizens
-    6, // Scouts
-    4, // Bombers
+    6,  // Scouts
+    4,  // Bombers
     1,  // Carriers
     6   // Roamers
   ],
 
   [ // 2
     5,  // Citizens
-    8, // Scouts
-    4, // Bombers
+    8,  // Scouts
+    4,  // Bombers
     2,  // Carriers
     7   // Roamers
   ],
@@ -658,7 +654,7 @@ waveData = [
   [ // 3
     6,  // Citizens
     10, // Scouts
-    5, // Bombers
+    5,  // Bombers
     2,  // Carriers
     8   // Roamers
   ],
@@ -666,7 +662,7 @@ waveData = [
   [ // 4
     7,  // Citizens
     12, // Scouts
-    5, // Bombers
+    5,  // Bombers
     2,  // Carriers
     9   // Roamers
   ],
@@ -674,41 +670,41 @@ waveData = [
   [ // 5
     8,  // Citizens
     13, // Scouts
-    5, // Bombers
+    5,  // Bombers
     3,  // Carriers
-    10   // Roamers
+    10  // Roamers
   ],
   
   [ // 6
     9,  // Citizens
     14, // Scouts
-    6, // Bombers
+    6,  // Bombers
     3,  // Carriers
-    11   // Roamers
+    11  // Roamers
   ],
 
   [ // 7
-    10,  // Citizens
+    10, // Citizens
     15, // Scouts
-    6, // Bombers
+    6,  // Bombers
     3,  // Carriers
-    12   // Roamers
+    12  // Roamers
   ],
 
   [ // 8
-    10,  // Citizens
+    10, // Citizens
     15, // Scouts
-    7, // Bombers
+    7,  // Bombers
     4,  // Carriers
-    13   // Roamers
+    13  // Roamers
   ],
 
   [ // 9
-    10,  // Citizens
+    10, // Citizens
     15, // Scouts
-    8, // Bombers
+    8,  // Bombers
     5,  // Carriers
-    14   // Roamers
+    14  // Roamers
   ]
 ],
 // #endregion
@@ -739,7 +735,7 @@ newCanvas = (w, h) => {
   canvas.ctx = ctx;
   canvas.width = w; // Set canvas dimensions
   canvas.height = h;
-  canvas.ctx.imageSmoothingEnabled = false; // For some messed up reason it only works with this, not just ctx.
+  canvas.ctx.imageSmoothingEnabled= 0; // For some messed up reason it only works with this, not just ctx.
   return canvas;
 },
 // Constrain the given  number into the given range
@@ -763,7 +759,7 @@ showCursor = (state) => {
 randomSpawnPoint = () => {
   return spawnPoints[rInt(spawnPoints.length - 1)]; // Get a random starting position
 },
-// Draw to the main canvas
+// Draw to the main context
 drawMain = (sx, sy, w, h, dx, dy) => {
   CTX.drawImage(ATLAS, sx, sy, w, h, dx, dy, w, h);
 },
@@ -773,42 +769,32 @@ clearBackGround = () => {
 },
 // execute this code when the application is about to enter the waves or game over states
 disableEverything = () => {
-  keysEnabled = false; // Disable keyboard input processing
-  aiEnabled = false; // Disable enemy and bullet AI
-  collisionEnabled = false; // Disable collision checking
+  keysEnabled= 0; // Disable keyboard input processing
+  aiEnabled= 0; // Disable enemy and bullet AI
+  collisionEnabled= 0; // Disable collision checking
 
-  playerRotating = false; // Lock player rotation
-  playerThrusting = false; // Stop more thrust particles being created
+  playerRotating= 0; // Lock player rotation
+  playerThrusting= 0; // Stop more thrust particles being created
   PLAYER.vX = 0;
   PLAYER.vY = 0;
-  playerFiring = false;
-  PLAYER.v = false; // Hide the player imagery
+  playerFiring= 0;
+  PLAYER.v= 0; // Hide the player imagery
 },
 // #endregion
 
 // #region Local Storage management
-
 // Save the given data with the given name to local storage
 saveLocalFile = (n, data) => {
   STORAGE.setItem(NAMESPACE + n, JSON.stringify(data));
 },
-
 // Load the item with the given name from local storage
 loadLocalFile = (n) => {
   return STORAGE.getItem(NAMESPACE + n);
 },
-
-// Delete the item with the given name from local storage
-// deleteLocalFile = (n) => {
-//   STORAGE.removeItem(NAMESPACE + n);
-// },
-
 // Save high scores to local storage
 saveScores = () => {
   saveLocalFile('s', SCORES);
 },
-
-
 // Reset high scores
 resetHighScores = () => {
   SCORES = [];
@@ -817,12 +803,10 @@ resetHighScores = () => {
   }
   saveScores(); // Save scores
 },
-
 // Save options to local storage
 saveOptions = () => {
   saveLocalFile('o', OPTIONS);
 },
-
 // Reset the options to default and save them to local storage
 resetOptions = () => {
   OPTIONS = {
@@ -849,11 +833,10 @@ resetOptions = () => {
 
   saveOptions(); // Save options to local storage
 },
-
 // #endregion
 
 // #region High Score Management
-// Add a new score to the hch score list, sort it, truncate it, then save it
+// Add the given score and given name to the highh score list, sort it, truncate it, then save it
 addNewScore = (name, score) => {
   let newScore = { // Create a new score
     n: name,
@@ -870,8 +853,7 @@ addNewScore = (name, score) => {
 // Create a new blank actor containing all common variables
 newActor = () => {
   return {
-
-    r: 0, // Role (player, enemy, bullet, etc)
+    r: 0, // Role (ROLE_PlAYER, ROLE_PARTICLE, ROLE_IMAGE, etc)
   
     x: 0, // Global coordinates
     y: 0,
@@ -889,22 +871,21 @@ newActor = () => {
     a: 1, // Alpha
     
     tR: null, // Texture region
-    iR: 0, // Imagery radius
+    rX: 0, // Texture radius x
+    rY: 0, // Texture radius y
 
     oX: 0, // Image offsets (added whenever the actor os drawn for animation purposes)
     oY: 0,
 
-    cS: false, // Draw a shadow for this actor if true
+    cS: 0, // Draw a shadow for this actor if true
 
     z: 0, // Z-index
 
     cR: 0, // Collision Radius
 
-    v: false, // True if visible
+    v: 0, // True if visible
 
-    f: false,
-
-    // expires: false, // True if this actor expires
+    f: 0, // True if this actor flashes
   };
 },
 // Set the given actors world coordinates
@@ -915,7 +896,8 @@ setPosition = (a, x, y) => {
 // Set the given actors texture region and calculate its image radius (iR)
 setTextureRegion = (a, r) => {
   a.tR = r; // Save the texture region
-  a.iR = r[2] / 2; // Save the radius of the region
+  a.rX = r[2] / 2; // Save the radius of the region
+  a.rY = r[3] / 2; // Save the radius of the region
 },
 // Get the texture region at the given index
 getTextureRegion = (r) => {
@@ -924,7 +906,7 @@ getTextureRegion = (r) => {
 // Make the given actor flash for a time
 flash = (actor) => {
   if (!actor.f) {
-    actor.f = true;
+    actor.f = 1;
     actor.oY = 32;
     actor.fC = FLASH_DURATION;
   }
@@ -935,7 +917,7 @@ doFlash = (actor) => {
     actor.fC -= DT; // Countdown till next gap between flashes
     if (actor.fC <= 0) { // If countdown reaches 0...
       actor.oY = 0; // Y offset in atlas to flashing image
-      actor.f = false; // set actor not flashing
+      actor.f= 0; // set actor not flashing
     }
   }
 },
@@ -983,7 +965,7 @@ resetPool = () => {
 
 },
 // Get a new actor for use (creating a new one if there are no free ones available).
-getActor = (role = ROLE_NONE) => {
+getActor = (role) => {
   let actor = IN.pop(); // Get the next available actor
 
   if (actor == undefined) actor = growPool(); // Create a new actor if the list of "available" actors is empty
@@ -992,9 +974,9 @@ getActor = (role = ROLE_NONE) => {
 
   actor.r = role;
 
-  actor.v = true; // Generally we will want the actor to be visible
+  actor.v = 1; // Generally we will want the actor to be visible
 
-  actor.cS = false; // By default cast no shadow
+  actor.cS= 0; // By default cast no shadow
 
   actor.lX = 0; // Local coordinates
   actor.lY = 0;
@@ -1012,7 +994,7 @@ getActor = (role = ROLE_NONE) => {
   actor.s = 1; // Scale
   actor.rR = 0; // Rotation rate
 
-  actor.alive = false; // He was D.O.A sir :(
+  actor.A= 0; // He was D.O.A sir :(
 
   actor.T = null; // Actor has no target
   
@@ -1181,16 +1163,16 @@ fx_bS = (volume, randomness, frequency, attack, sustain, release, shape, shapeCu
 // #region Scene Transition
 // Begin a scene transition. Basically this sets a global alpha value that is applied to every actor that is drawn, effectively alpha fading the entire scene in and out
 transition = (direction, callback) => {
-  ui_locked = true; // Disable button clicking
-  keysEnabled = false; // disable keyboard input
+  ui_locked = 1; // Disable button clicking
+  keysEnabled= 0; // disable keyboard input
   transitionAlpha = direction; // Set alpha
-  transitioningIn = (direction == 1); // Set fading in or out
+  transitioningIn = direction; // Set fading in or out
   onTransitionComplete = callback; // Save callback code
-  transitioning = true; // Set application to be transitioning
+  transitioning = 1; // Set application to be transitioning
 },
 // A transition has completed, set application to not be transitioning, and call onTransitionComplete code
 transitionComplete = () => {
-  transitioning = false;
+  transitioning= 0;
   onTransitionComplete(); // Call code
 },
 // #endregion
@@ -1330,7 +1312,7 @@ showInfo = (s, callback, duration = 2) => {
   infoLabel = newCenteredTextField(s, 120); // Create the label
   infoCallback = callback; // Save code to be run when fthe label is faded out
   infoCounter = duration; // Reset fade counter
-  infoVisible = true; // Enable info text fade
+  infoVisible = 1; // Enable info text fade
 },
 // Font (Windows10 builtin "small fonts"). Each character descriptor in fontDescriptor.c contains the x position and width, the other dimensions are hard coded
 fontDescriptor={f:32,h:11,c:[[0,4],[468,3],[0,0],[134,7],[141,7],[46,8],[148,7],[0,0],[442,4],[434,4],[430,4],[389,5],[453,3],[426,4],[462,3],[422,4],[353,6],[418,4],[383,6],[239,6],[245,6],[341,6],[251,6],[257,6],[263,6],[269,6],[450,3],[474,3],[0,0],[394,5],[0,0],[0,0],[10,10],[126,8],[38,8],[62,8],[54,8],[204,7],[211,7],[78,8],[86,8],[471,3],[275,6],[218,7],[281,6],[0,10],[94,8],[118,8],[110,8],[102,8],[70,8],[197,7],[190,7],[183,7],[176,7],[20,9],[169,7],[162,7],[155,7],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[293,6],[299,6],[305,6],[311,6],[317,6],[414,4],[323,6],[329,6],[456,3],[459,3],[335,6],[465,3],[29,9],[347,6],[225,7],[359,6],[287,6],[438,4],[365,6],[446,4],[371,6],[377,6],[232,7],[399,5],[404,5],[409,5]]},
@@ -1424,7 +1406,7 @@ generateBackground = () => {
         }
         n -= grid[r][c]; // Subtract this cell because we added it above, and it is not required.
         // Update cells state ("alive" or "dead")
-        if (grid[r][c] == 1) { // If this cell is "alive", we need to check if it will continue to live, or die.
+        if (grid[r][c]) { // If this cell is "alive", we need to check if it will continue to live, or die.
           if (n < 3) grid[r][c] = 0 // This cell "dies" if there are less than the death limit of "alive" cells around it
         } else { // The cell is "dead", check if it can be "born"
           if (n > 4) grid[r][c] = 1 // If its a "dead" cell, it can be "born" if it is surrounded by enough "alive" cells
@@ -1474,7 +1456,7 @@ updateScout = (scout) => {
   scout.angle += scout.spd * DT; // Update scout position on circumference of its orbit
   let x = MID_WORLD + cos(scout.angle) * scout.distance, // Calculate coordinates
   y = MID_WORLD + sin(scout.angle) * scout.distance,
-  direction = atan2(MID_WORLD - y, MID_WORLD - x); // Calculate angle from center of world to actor coordinates
+  direction = angleTo(MID_WORLD - y, MID_WORLD - x); // Calculate angle from center of world to actor coordinates
   (scout.spd > 0) ? scout.rot = direction * RADTODEG + 90 : scout.rot = direction * RADTODEG - 90; // Face scout in the direction of their movement
   setPosition(scout, x, y);
 
@@ -1519,12 +1501,12 @@ newEnemy = (type, x, y, a = 0) => {
   if (type == ET_AGGRESSOR) { // Is it an aggressor?
     // Yes... no scaling because aggressors are supposed to be mean!
     enemy.mS = attributes[EA_MAX_SPEED];
-    enemy.range = attributes[EA_TARGETING_RANGE];
+    enemy.R = attributes[EA_TARGETING_RANGE];
     enemy.rD = attributes[EA_RELOAD_DURATION];
       
   } else { // No, scale
     enemy.mS = upScaleAttribute(attributes[EA_MAX_SPEED]);
-    enemy.range = upScaleAttribute(attributes[EA_TARGETING_RANGE]);
+    enemy.R = upScaleAttribute(attributes[EA_TARGETING_RANGE]);
     enemy.rD = downScaleAttribute(attributes[EA_RELOAD_DURATION]);
   
   }
@@ -1536,12 +1518,12 @@ newEnemy = (type, x, y, a = 0) => {
   enemy.pI = attributes[EA_POINT_IMAGE];
   enemy.pV = attributes[EA_POINT_VALUE];
 
-  enemy.cF = false; // Can fire
+  enemy.cF= 0; // Can fire
   enemy.rC = .1; // Reload counter
 
-  enemy.alive = true; // It livesssss!
+  enemy.A = 1; // It livesssss!
 
-  (type < ET_BULLET1) ? enemy.cS = true : enemy.cS = false; // Bullets don't cast shadows, all other enemy types do cast shadows
+  (type < ET_BULLET1) ? enemy.cS = 1 : enemy.cS= 0; // Bullets don't cast shadows, all other enemy types do cast shadows
 
   enemy.t = type; // Save the type
 
@@ -1664,13 +1646,13 @@ newEnemy = (type, x, y, a = 0) => {
 // Give a dog a bone ;)
 awardPoints = (n) => {
   playerScore += n; // Increment score
-  playerScoreChanged = true; // Set score changed this frame
+  playerScoreChanged = 1; // Set score changed this frame
 },
 // Update the player score label
 updatePlayerScoreLabel = () => {
   scoreLabel.label = playerScore.toLocaleString(); // Update the label
   scoreLabel.x = centerText(scoreLabel.label); // Center it on the display
-  playerScoreChanged = false; // Set label not changed
+  playerScoreChanged= 0; // Set label not changed
 },
 
 
@@ -1706,10 +1688,10 @@ nextWave = () => {
   PLAYER.rR = 0; // Not rotating
   PLAYER.vX = 0; // Not moving
   PLAYER.vY = 0;
-  PLAYER.v = true; // Is visible
-  playerCanFire = true; // Can fire
-  playerFiring = false; // But is not currently firing
-  PLAYER.f = false; // Not flashing
+  PLAYER.v = 1; // Is visible
+  playerCanFire = 1; // Can fire
+  playerFiring= 0; // But is not currently firing
+  PLAYER.f= 0; // Not flashing
   playerLife = PLAYER_MAX_LIFE; // Reset life to max
 
   // 
@@ -1722,7 +1704,7 @@ nextWave = () => {
 
   for (let i = 0; i < citizenCount; i++) { // Create this many citizens
     let citizen = getActor(ROLE_CITIZEN); // Get a new actor to represent the citizen
-    citizen.cS = true; // Citizens cast a shadow
+    citizen.cS = 1; // Citizens cast a shadow
 
     citizen.vX = -5 + random() * 10; // Set citizen moving in a random direction at a random speed
     citizen.vY = -5 + random() * 10;
@@ -1736,7 +1718,7 @@ nextWave = () => {
     setTextureRegion(citizen, getTextureRegion(TR_CITIZEN)); // Set texture region
     citizen.cR = 6; // Set collision radius
 
-    citizen.rescued = false;
+    citizen.rescued= 0;
 
     randomizePosition(citizen); // Place the citizen at random coordinates
 
@@ -1786,9 +1768,9 @@ nextWave = () => {
 
   transition(0, () => {
     // This code is run when the scene is completely faded in and gameplay can begin
-    keysEnabled = true; // Enable keyboard input
-    aiEnabled = true; // Enable bullet and enemy AI
-    collisionEnabled = true; // Enable collision checks
+    keysEnabled = 1; // Enable keyboard input
+    aiEnabled = 1; // Enable bullet and enemy AI
+    collisionEnabled = 1; // Enable collision checks
 
     showInfo(`Rescue ${citizenCount} citizens`, () => {});
   });
@@ -1800,7 +1782,7 @@ nextWave = () => {
 // Fade the menu in, enable button clicking, and show the mouse pointer
 showMenu = () => {
   transition(0, () => {
-    ui_locked = false;
+    ui_locked= 0;
     showCursor(true);
   });
 },
@@ -1818,12 +1800,12 @@ mainMenuButton = () => {
   newButton(64, 215, 128, 'Main Menu', () => { // Main menu button
     if (newHigh) { // Was there a new high score?
       saveScores(); // Save high scores
-      newHigh = false; // Set state to no new high score
-      enteringName = false // Not entering a name
+      newHigh= 0; // Set state to no new high score
+      enteringName= 0 // Not entering a name
     }
     helpImages = []; // Clear help images
-    controlsChanged = false;
-    awaitingControlKey = false;
+    controlsChanged= 0;
+    awaitingControlKey= 0;
 
     if (optionsChanged) saveOptions(); // Save options if required
     changeMenu(mainMenu); // Go to the main menu
@@ -1876,7 +1858,7 @@ scoresMenu = () => {
 
   label = HIGH_SCORE_LABEL;
   if (newHigh) {
-    enteringName = true;
+    enteringName = 1;
     label = 'New High.. Enter Your Name';
   }
   
@@ -1911,11 +1893,11 @@ optionsMenu = () => {
       setButtonLabel(button, 'Press Key'); // Indicate that this key wants a remap
       controlIndex = index; // Save index and button
       controlButton = button;
-      awaitingControlKey = true; // Set awaiting keypress for new control key mapping
+      awaitingControlKey = 1; // Set awaiting keypress for new control key mapping
     }
   };
 
-  optionsChanged = false; // Options don;t need to be saved when this menu closes
+  optionsChanged= 0; // Options don;t need to be saved when this menu closes
 
   stopSparkles(); // Stop logo sparkle effects
 
@@ -1928,7 +1910,7 @@ optionsMenu = () => {
     OPTIONS.a = !OPTIONS.a;
     (OPTIONS.a) ? setButtonLabel(audioEnabledButton, ON_LABEL) : setButtonLabel(audioEnabledButton, OFF_LABEL);
     fx_play(FX_CLICK);
-    optionsChanged = true;
+    optionsChanged = 1;
   });
 
   newTextField('Rotate Left', 32, 75);
@@ -2138,7 +2120,7 @@ let generateAssets = () => {
     // Some descriptors can be used to generate texture regions, saving many bytes of code ;)
     // 
 
-    if (descriptor[7] == 1) { // Push a new texture region?
+    if (descriptor[7]) { // Push a new texture region?
       textureRegions.push([descriptor[4], descriptor[5], descriptor[3], descriptor[3]]); // Push it!
     }
   };
@@ -2151,13 +2133,8 @@ let generateAssets = () => {
     remap ([32,32, 480,13, 32,108 + i * 12,    20, 0]);
   }
   
-  for (let i = 0; i < remappingDescriptors.length; i++) {
-    
-    remap(remappingDescriptors[i]);
-
-    //let descriptor = remappingDescriptors[i], // Next descriptor
-
-
+  for (let i = 0; i < remappingDescriptors.length; i++) { // Process all descriptors
+    remap(remappingDescriptors[i]); // Remap next rectangular area of the atlas
   }
 
   // 
@@ -2221,11 +2198,11 @@ keyDown = (e) => {
 
     } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // "CTRL"
 
-      playerThrusting = true; // Player wants to thrust
+      playerThrusting = 1; // Player wants to thrust
     
     } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // "SPACE"
 
-      playerFiring = true; // Player wants to fire
+      playerFiring = 1; // Player wants to fire
 
     }
   }
@@ -2248,12 +2225,12 @@ keyUp = (e) => {
 
     } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // "CTRL"
 
-      playerThrusting = false; // Stop player thrusting
+      playerThrusting= 0; // Stop player thrusting
       playerThrustDelay = 0;
 
     } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // "SPACE"
 
-      playerFiring = false;
+      playerFiring= 0;
 
     } else if (k == 80) { // p
       paused = !paused; // Toggle paused state
@@ -2297,7 +2274,7 @@ keyUp = (e) => {
     if (k == 13) { // Enter or return
       scoreTiteLabel.label = HIGH_SCORE_LABEL; // Set the title back to "High Scores"
       scoreTiteLabel.x = centerText(HIGH_SCORE_LABEL); // Recenter the title
-      enteringName = false; // Not entering a name anymore
+      enteringName= 0; // Not entering a name anymore
     }
 
   } else if (awaitingControlKey) { // Are we waiting for the player to press a key to remap a control function?
@@ -2305,8 +2282,8 @@ keyUp = (e) => {
     setButtonLabel(controlButton, e.code);
     OPTIONS.c[controlIndex].c = e.code;
     OPTIONS.c[controlIndex].k = k;
-    optionsChanged = true; // Options will be saved when options menu closed
-    awaitingControlKey = false; // No longer waiting for this event
+    optionsChanged = 1; // Options will be saved when options menu closed
+    awaitingControlKey= 0; // No longer waiting for this event
   }
 },
 // #endregion 
@@ -2318,12 +2295,12 @@ seek = (actor) => {
   let diff,
   rot = actor.rot * DEGTORAD, // Get actor rotation
 
-  targetAngle = atan2(actor.T.y - actor.y, actor.T.x - actor.x); // Calculate angle to target coordinates
+  targetAngle = angleTo(actor.T.y - actor.y, actor.T.x - actor.x); // Calculate angle to target coordinates
   
   if (rot != targetAngle) { // Is the actor already facing directly at the target?
     // No... steer towards the target
 
-    actor.fT = false; // True if actor is facing directly at the target
+    actor.fT= 0; // True if actor is facing directly at the target
 
     diff = targetAngle - rot; // Calculate difference between the current angle and targetAngle
   
@@ -2334,13 +2311,16 @@ seek = (actor) => {
     
     if (abs(diff) < (actor.tS)) { // If the difference is within this margin of error...
       rot = targetAngle; // Set the rotation so the actor will be directlyfacing the target
-      actor.fT = true; // set actor flag so they know that they are in fact directly facing the actor
+      actor.fT = 1; // set actor flag so they know that they are in fact directly facing the actor
     }
   }
   actor.vX = cos(rot) * actor.mS; // Set new velociy
   actor.vY = sin(rot) * actor.mS;
   
   actor.rot = rot * RADTODEG; // Save rotation in degrees
+},
+angleTo = (a, b) => {
+  return atan2(a, b);
 },
 // Get the distance between the two given coordinates
 distanceBetween =(a, b) => {
@@ -2352,16 +2332,16 @@ inRange = (a, b, d) => {
 },
 // If the player is in range of the given actor and it can fire, fire on the player, otherwise countdown until it can fire again
 fire = (actor, callback) => {
-  if ((inRange(actor, PLAYER, actor.range))) {
+  if ((inRange(actor, PLAYER, actor.R))) {
     if (actor.cF) { // Can the actor fire?
       // YES! Fire!!
       callback();
-      actor.cF = false; // Can not fire
+      actor.cF= 0; // Can not fire
       actor.rC = actor.rD; // Reset reloading counter
     } else {
       actor.rC -= DT // Counting down till reloaded
       if (actor.rC <= 0) { // Reloaded?
-        actor.cF = true; // Can fire next frame
+        actor.cF = 1; // Can fire next frame
       }
     }
   }
@@ -2370,7 +2350,7 @@ fire = (actor, callback) => {
 releaseTheSwarm = (actor) => {
   if (actor.t == ET_CARRIER) {
     fx_play(FX_SWARM_WARNING);
-    let angle = atan2(PLAYER.vY, PLAYER.vX) * RADTODEG % 360;
+    let angle = angleTo(PLAYER.vY, PLAYER.vX) * RADTODEG % 360;
     for (let j = 0; j < 6; j++) {
       newEnemy(ET_SWARMER, actor.x, actor.y, angle - 60 + rInt(120));
     }
@@ -2395,11 +2375,11 @@ newParticle = (ttl, x, y, direction, speed, fades, alpha, shrinks, scale, rotRat
   p.x = x, // Position
   p.y = y,
 
-  p.fades = fades; // Fading settings
+  p.fa = fades; // Fading settings
   p.a = alpha;
   p.a2 = alpha;
 
-  p.shrinks = shrinks; // Shrinking settings
+  p.sh = shrinks; // Shrinking settings
   p.s = scale;
   p.s2 = scale;
 
@@ -2431,7 +2411,7 @@ updateGreenIndicator = () => {
       }
     }
     if (closest) { // Make sure there is something close (not the case when all citizens have been rescued)
-      d = atan2(closest.y - py, closest.x - px); // Calculate the angle from the player to the closest citizen
+      d = angleTo(closest.y - py, closest.x - px); // Calculate the angle from the player to the closest citizen
       greenIndicator.v = (!onScreen(closest)); // Make the indicator invisible if the closest citizen is visible to the player
       greenIndicator.x = 128 + cos(d) * 116; // Update the indicators position
       greenIndicator.y = 128 + sin(d) * 116;
@@ -2483,24 +2463,33 @@ moveAndConstrain = (actor) => {
 
   applyVelocities(actor); // Apply the actors velocities to its coordinates
 
-  if (actor.x - actor.iR < 0) { // Constrain on x axis, bouncing off left and right edges of world
-    actor.x = actor.iR;
+  if (actor.x - actor.rX < 0) { // Constrain on x axis, bouncing off left and right edges of world
+    actor.x = actor.rX;
     actor.vX = -actor.vX;
-  } else if (actor.x + actor.iR > WORLD_SIZE) {
-    actor.x = WORLD_SIZE - actor.iR;
+  } else if (actor.x + actor.rX > WORLD_SIZE) {
+    actor.x = WORLD_SIZE - actor.rX;
     actor.vX = -actor.vX;
   }
   
-  if (actor.y - actor.iR < 0) {  // Constrain on x axis, bouncing off top and bottom edges of world
-    actor.y = actor.iR;
+  if (actor.y - actor.rY < 0) {  // Constrain on x axis, bouncing off top and bottom edges of world
+    actor.y = actor.rY;
     actor.vY = -actor.vY;
-  } else if (actor.y + actor.iR > WORLD_SIZE) {
-    actor.y = WORLD_SIZE - actor.iR;
+  } else if (actor.y + actor.rY > WORLD_SIZE) {
+    actor.y = WORLD_SIZE - actor.rY;
     actor.vY = -actor.vY;
   }
 },
 // Draw the given actor to the display as a shadow, or as the actual image
-drawActor = (actor, shadow = false) => {
+drawActor = (actor, shadow= 0) => {
+
+  // Draw a circle centered on the actor with the given radius and given color
+  let circle = (r, c) => {
+    CTX.strokeStyle = c;
+    CTX.beginPath();
+    CTX.arc(0, 0, r, 0, PI2);
+    CTX.stroke();
+  };
+
   if (actor.v) { // Only draw if the actor is visible
 
     let r = actor.tR, // Get texture region
@@ -2522,7 +2511,7 @@ drawActor = (actor, shadow = false) => {
       CTX.translate(lX - 4 , lY + 4); // Apply transformations
       CTX.rotate(DEGTORAD * rotation);
       
-      drawMain(r[0], r[1] - 32, r[2], r[3], -actor.iR, -actor.iR);
+      drawMain(r[0], r[1] - 32, r[2], r[3], -actor.rX, -actor.rY);
   
     } else {
 
@@ -2542,17 +2531,17 @@ drawActor = (actor, shadow = false) => {
         CTX.scale(actor.s, actor.s);
   
         CTX.rotate(DEGTORAD * rotation);
-        drawMain(r[0] + actor.oX, r[1] + actor.oY, r[2], r[3], -actor.iR, -actor.iR);
+        drawMain(r[0] + actor.oX, r[1] + actor.oY, r[2], r[3], -actor.rX, -actor.rY);
 
         if ((DEBUG) && (actor.r == ROLE_ENEMY)) { // Is debug enabled, AND is the actor an enemy?
           if (actor.t <= ET_SWARMER) { // we only want actual enemies, not enemy bullets
 
-            CTX.lineWidth = 1;
+            //CTX.lineWidth = 1;
 
             if (actor.T) { // Current target
 
-              let a = atan2(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90; // Calculate angle to target coordinates
-              let d = distanceBetween(actor, actor.T);
+              let a = angleTo(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90, // Calculate angle to target coordinates
+              d = distanceBetween(actor, actor.T);
 
               CTX.strokeStyle = '#ff0';
               CTX.beginPath();
@@ -2562,15 +2551,9 @@ drawActor = (actor, shadow = false) => {
               CTX.stroke();
             }
 
-            CTX.strokeStyle = '#08f'; // Collision Radius
-            CTX.beginPath();
-            CTX.arc(0, 0, actor.cR, 0, PI2);
-            CTX.stroke();
-            
-            CTX.strokeStyle = '#f00'; // Targeting range
-            CTX.beginPath();
-            CTX.arc(0, 0, actor.range, 0, PI2);
-            CTX.stroke();
+            circle(actor.cR, '#08f'); // Draw a circle centered on the actor wth a radius of its collision radius
+
+            circle(actor.R, '#f00'); // Draw a circle centered on the actor wth a radius of its targeting range
           }
         }
 
@@ -2636,9 +2619,9 @@ onEnterFrame = () => {
     if (actor.v) {
 
       if (actor.r >= ROLE_CITIZEN) { // Only actors with a role higher than this value will be considered for collision detection
-        if (actor.alive) { // Only process alive actors
+        if (actor.A) { // Only process alive actors
           // The collision list can only contain actors that can actually collide with the player, nothing else.
-          if ((actor.x - actor.iR < vR + 128) && (actor.x + actor.iR > vL - 128) && (actor.y - actor.iR < vB + 128) && (actor.y + actor.iR > vT - 128)) { // Is the actor inside the defined collision area?
+          if ((actor.x - actor.rX < vR + 128) && (actor.x + actor.rX > vL - 128) && (actor.y - actor.rY < vB + 128) && (actor.y + actor.rY > vT - 128)) { // Is the actor inside the defined collision area?
             collisionList.push(actor); // Add to collision list
           }
         }
@@ -2648,7 +2631,7 @@ onEnterFrame = () => {
         renderList.push(actor); // Add actor to the list of actors that will need to be rendered this frame
         
       } else {
-        if ((actor.x - actor.iR < vR) && (actor.x + actor.iR > vL) && (actor.y - actor.iR < vB) && (actor.y + actor.iR > vT)) { // Is the actor inside the visible area?
+        if ((actor.x - actor.rX < vR) && (actor.x + actor.rX > vL) && (actor.y - actor.rY < vB) && (actor.y + actor.rY > vT)) { // Is the actor inside the visible area?
           actor.lX = actor.x - vL; // Calculate actors local coordinates
           actor.lY = actor.y - vT;
           renderList.push(actor); // Add actor to the list of actors that will need to be rendered this frame
@@ -2667,7 +2650,7 @@ onEnterFrame = () => {
     for (let i = 0; i < collisionList.length; i++) {
       other = collisionList[i];
       if (other.r == role) { // Only check others with the given role
-        if (other.alive) { // Only check alive others
+        if (other.A) { // Only check alive others
           if (collides(actor, other)) { // Do the two actors overlap?
             callback(); // If so, run this code
             return;
@@ -2727,7 +2710,7 @@ onEnterFrame = () => {
               // Player collided with a citizen. Rescue that little guy!
               // 
   
-              other.rescued = true; // set citizen state to "rescued"
+              other.rescued = 1; // set citizen state to "rescued"
   
               newParticle( // Spawn a particle using the citizen imagery that just shoots off the top of the display quickly
                 .5, // ttl
@@ -2834,7 +2817,7 @@ onEnterFrame = () => {
                 lifeImage.oX = playerLife * 72; // Set atlas x offset
                 if (playerLife <= 0) {
 
-                  DEBUG = false; // Disable debug output
+                  DEBUG= 0; // Disable debug output
 
                   fx_play(FX_GAME_OVER);
 
@@ -2847,7 +2830,7 @@ onEnterFrame = () => {
                       clearBackGround();
 
                       if (playerScore > SCORES[SCORES.length - 1].s) {
-                        newHigh = true; // Let the scores menu know that the player got a new high score
+                        newHigh = 1; // Let the scores menu know that the player got a new high score
                         SCORES.length = 4; // Truncate the last one
                         newScore = addNewScore('', playerScore); // Add the new score and keep a reference to it
                       }
@@ -2893,7 +2876,7 @@ onEnterFrame = () => {
     if (playerCanFire) { // Can the player fire?
       if (playerFiring) { // Only fire if the SPACE key is being held
         playerReloadCounter = PLAYER_RELOAD_DURATION; // Set reload delay
-        playerCanFire = false; // Set player reloading
+        playerCanFire= 0; // Set player reloading
 
         // Spawn a new player bullet at the players coordinates, moving in the direction that the player is facing
         let bullet = getActor(ROLE_BULLET); // Create a new player bullet actor
@@ -2912,7 +2895,7 @@ onEnterFrame = () => {
       }
     } else { // The player is reloading
       playerReloadCounter -= DT; // Countdown till next possibility to fire
-      if (playerReloadCounter <= 0) playerCanFire = true; // If the counter is equal to or less than 0, the player can fire another bullet
+      if (playerReloadCounter <= 0) playerCanFire = 1; // If the counter is equal to or less than 0, the player can fire another bullet
     }
     // #endregion
 
@@ -2966,8 +2949,8 @@ onEnterFrame = () => {
         actor.x += actor.vX * DT; // Update position
         actor.y += actor.vY * DT;
         ratio = 1/actor.ttl * actor.gpc; // Scaling ratio
-        if (actor.fades) actor.a = actor.a2 * ratio; // Scale alpha
-        if (actor.shrinks) actor.s = actor.s2 * ratio; // Scale size
+        if (actor.fa) actor.a = actor.a2 * ratio; // Scale alpha
+        if (actor.sh) actor.s = actor.s2 * ratio; // Scale size
         if (actor.frames > 0) setTextureRegion(actor, [actor.iX + (actor.tR[2] * clamp(actor.frames - floor(actor.frames * ratio) - 1, 0, actor.frames - 1)), actor.tR[1], actor.tR[2], actor.tR[3]]); // Don't ask. Just accept that this code animates a particle over time, and move on with your life :D
         actor.gpc -= DT; // Decrement ttl
         if (actor.gpc <= 0) freeActor(actor) // If the ttl reaches 0 or below, just recycle the actor, effectively removing it from the scene
@@ -2986,7 +2969,7 @@ onEnterFrame = () => {
 
           updateScout(actor);
           fire(actor, () => { // Fire at the player
-            newEnemy(ET_BULLET1, actor.x, actor.y, atan2(PLAYER.y - actor.y, PLAYER.x - actor.x) * RADTODEG // Calculate angle to target coordinates
+            newEnemy(ET_BULLET1, actor.x, actor.y, angleTo(PLAYER.y - actor.y, PLAYER.x - actor.x) * RADTODEG // Calculate angle to target coordinates
             );
           });
           
@@ -3002,7 +2985,7 @@ onEnterFrame = () => {
           
           if (inRange(actor, actor.T, 8)) targetCoordinatesNearPLayer(actor); // If the actor is "close" to the current target, create a new one
           fire(actor, () => { // Fire at the player
-            newEnemy(ET_MISSILE, actor.x, actor.y, atan2(PLAYER.y - actor.y, PLAYER.x - actor.x) * RADTODEG // Calculate angle to target coordinates
+            newEnemy(ET_MISSILE, actor.x, actor.y, angleTo(PLAYER.y - actor.y, PLAYER.x - actor.x) * RADTODEG // Calculate angle to target coordinates
             );
           });
 
@@ -3152,7 +3135,7 @@ onEnterFrame = () => {
       if (infoCounter <= 0) { // Is the label completely faded out?
         infoCallback(); // Run code
         freeActor(infoLabel); // Recycle label
-        infoVisible = false; // Intro complete
+        infoVisible= 0; // Intro complete
       }
     }
 
@@ -3415,8 +3398,8 @@ PLAYER = newActor();
 PLAYER.r = ROLE_PLAYER;
 PLAYER.cR = 6;
 PLAYER.z = 5;
-PLAYER.cS = true;
-PLAYER.v = false;
+PLAYER.cS = 1;
+PLAYER.v= 0;
 setTextureRegion(PLAYER, getTextureRegion(TR_PLAYER));
 
 TARGET = PLAYER; // Set the camera target
@@ -3458,3 +3441,34 @@ mainMenu();
 
 lastFrame = Date.now(); // Set the (fake) last EnterFrame event time
 onEnterFrame(); // Request the first actual EnterFrame event
+
+let q = .5;
+if (q -= 1 < 0) {
+  console.log(q);
+}
+
+let w = .5;
+w -= 1;
+if (w < 0) {
+  console.log(w);
+}
+
+let arr = [1, 2, 3];
+
+// for (let i = 0; i < 10; i++) {
+//   console.log(i);
+// }
+// let n = 0;
+// while (n < 10) {
+//   console.log(n);
+// }
+
+// for...of loop
+for(let e of arr) {
+  console.log(e);
+}
+
+// // .forEach() method
+// arr.forEach((e) => {
+//   console.log(e);
+// });
