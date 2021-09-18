@@ -128,7 +128,7 @@ Eventually I fabricated some code that met all of my requirements in roughly 30 
 
 ## Procedurally generated backgrounds
 
-As mentioned previously, I already had all of the code required for this functionality created whilst working on the abandonned civilization prototype.
+As mentioned previously, I already had all of the code required for this functionality created whilst working on the abandoned civilization prototype.
 
 Given more time I would have added some code to recolor the background tile-set between attack waves, but I was bogged down on the final day bug hunting and madly trying to get some other crucial features implemented.
 
