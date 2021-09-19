@@ -55,15 +55,28 @@ It might be worth investigating whay it fails so terribly in Chrome as I think I
 		// execute code
 	);
 
-  // Same but using less code
+    // Same but using less code
 	if ((counter -= DT) < 0) {
 		// execute code
 	);
 
 ````
-
 - All of the above takes the final zip file to 13,302 bytes, still within js13k limits... by 10 bytes!
 
 - I am still wondering if I can get SOS working in Chrome when using Roadroller, as currently SOS only works correctly in Firefox after being road-rolled.
+
+**20/9/2021**
+
+- Moved `remap()` outside of `generateAssets()` so that it can be called to recolor the background tileset.
+
+- Added code in `generateBackground()` to recolor the background tiles using a random Hue, set saturation, and set ligntness.
+
+- Disabled debug view.
+
+- Changed all occurences of `null` and `false` to `0`, and `true` to `1` since `true/false` checks evaluate correctly with those values. It also uses  loads less code.
+
+- Compressed zip file is now 13,296 bytes, still within js13k constraints.
+
+- Still no luck with RoadRoller which I can accept but it is mildly annoying since the zip file becomes 12,093 bytes using the roadrolled code and I'm sure I could re-enable the debug code (because I like it) and add another control, the BTFU button for quick reverse thrusting.
 
 </div>

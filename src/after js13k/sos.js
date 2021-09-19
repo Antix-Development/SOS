@@ -17,6 +17,7 @@ let D = document,
 W = window,
 STORAGE = W.localStorage,
 M = Math,
+max = M.max,
 min = M.min,
 random = M.random,
 floor = M.floor,
@@ -35,8 +36,8 @@ FLASH_DURATION = 0.075, // Duration of flash when any given actor is flashing
 // #endregion
 
 // #region Debugging
-DEBUG= 0,
-debugLabel,
+// DEBUG= 0,
+// debugLabel,
 
 // #endregion
 
@@ -167,7 +168,7 @@ cursorVisible = 1, // True if the pointer is visible
 transitionAlpha = 1,
 transitioningIn= 0,
 transitioning= 0, // True if fading scene in or out
-onTransitionComplete = null,
+onTransitionComplete = 0,
 aiEnabled= 0, // True if enemy and bullet actors can update their states
 // #endregion
 
@@ -179,12 +180,12 @@ OFF_LABEL = "Disabled",
 
 BUTTONS = [], // List of buttons that can be clicked
 ui_locked = 1,
-ui_selected = null, // Widget that was most recently clicked on
+ui_selected = 0, // Widget that was most recently clicked on
 ui_fontX = 32, // Coordinates of the font inside the main texture atlas
 ui_fontY = 96,
 
 helpImages = [],
-logoImage = null,
+logoImage = 0,
 sparkleCounter = 1,
 
 // #endregion
@@ -374,7 +375,7 @@ palettes = [
   [4, 5, 6],              // 18 - bullet2 (muon)
   [0, 0, 1],              // 19 - life_grey
   
-  [30, 31, 29]             // 20 - Rainbow font
+  [30, 31, 29]             // 20 - Rainbow font, and colored particles for explosions
 ],
 
 // Colors for font generation
@@ -394,18 +395,13 @@ rainbow = [
 // Array of descriptors containing information required to draw and recolor images in the atlas.
 // The format of a descriptor is... [sx, sy, w, h, dx, dy, palette, pushRegion]
 remappingDescriptors = [
-  [32,32, 480,12, 32,96,    4, 0],    //  Font (white)
+  [32,32, 480,12, 32,96,    4, 0],    // 0 Font (white)
 
-  // [32,32, 480,13, 32,108,  13, 0],    //  Font (xxxx)
-  // [32,32, 480,13, 32,108,  13, 0],    //  Font (xxxx)
-  // [32,32, 480,13, 32,108,  13, 0],    //  Font (xxxx)
-  // [32,32, 480,13, 32,108,  13, 0],    //  Font (xxxx)
-
-  [0,32, 32,8, 0,96,        10, 0],   //  Citizen
-  [304,0, 16,24, 304,32,    3, 0],    //  Buttons
-  [16,0, 288,16, 16,32,     7, 0],    //  Tiles
-  [0,0, 512,32, 0,64,       2, 0],    //  Flash
-  [278,16, 8,8, 278,48,     0, 0],    //  Thrust (cannot be pushed)
+  [0,32, 32,8, 0,96,        10, 0],   // 1 Citizen
+  [304,0, 16,24, 304,32,    3, 0],    // 2 Buttons
+  [16,0, 288,16, 16,32,     7, 0],    // 3 Tiles
+  [0,0, 512,32, 0,64,       2, 0],    // 4 Flash
+  [278,16, 8,8, 278,48,     0, 0],    // 5 Thrust (cannot be pushed)
 
   [256,24, 8,8, 256,48,     13, 0],   //  Life (blue)
   [256,24, 8,8, 256,56,     19, 0],   //  Life (grey)
@@ -871,7 +867,7 @@ newActor = () => {
     s: 1, // Scale
     a: 1, // Alpha
     
-    tR: null, // Texture region
+    tR: 0, // Texture region
     rX: 0, // Texture radius x
     rY: 0, // Texture radius y
 
@@ -882,7 +878,7 @@ newActor = () => {
 
     z: 0, // Z-index
 
-    cR: 0, // Collision Radius
+    // cR: 0, // Collision Radius
 
     v: 0, // True if visible
 
@@ -925,10 +921,10 @@ doFlash = (actor) => {
 onScreen = (actor) => {
   for (let i = 0; i < renderList.length; i++) { // Check all actors
     if (renderList[i] == actor) { // Is this the actor we were looking for?
-      return true; // The actor is contained inside the render list
+      return 1; // The actor is contained inside the render list
     }
   }
-  return false; // The actor was not found
+  return 0; // The actor was not found
 },
 // Set the given actors position to random coordinates in the world
 randomizePosition = (actor, ) => {
@@ -996,7 +992,7 @@ getActor = (role) => {
 
   actor.A= 0; // He was D.O.A sir :(
 
-  actor.T = null; // Actor has no target
+  actor.T = 0; // Actor has no target
   
   
   actor.z = 1;
@@ -1066,7 +1062,7 @@ SOFTWARE.
 */
 gV = .3, // Global volume
 sR = 44100, // Sample rate
-aC = null, // Audio context
+aC = 0, // Audio context
 fx = [], // List of all fx (storred and accessed by name)
 // Create and add samples to the list of all playable effects, using the given zzfx parameters
 fx_add = (parameters) => {
@@ -1074,9 +1070,7 @@ fx_add = (parameters) => {
 },
 // Play the fx with the given name
 fx_play = (index) => {
-  if (OPTIONS.a) {
-    if (index > FX_NONE) return fx_pS(fx[index - 1]); // Play the sound if it wasn't FX_NONE
-  }
+  if (OPTIONS.a && index > FX_NONE) return fx_pS(fx[index - 1]); // Play the sound if it isn't FX_NONE, and sound effects are enabled in options
 },
 // Play an array of samples
 fx_pS = (samples) => {
@@ -1091,12 +1085,12 @@ fx_pS = (samples) => {
   return source;
 },
 // Build an array of samples
-fx_bS = (volume, randomness, frequency, attack, sustain, release, shape, shapeCurve, slide, deltaSlide, pitchJump, pitchJumpTime, repeatTime, noise, modulation, bitCrush, delay, sustainVolume, decay, tremolo) => {
+fx_bS = (volume, frequency, attack, sustain, release, shape, shapeCurve, slide, deltaSlide, pitchJump, pitchJumpTime, repeatTime, noise, modulation, bitCrush, delay, sustainVolume, decay, tremolo) => {
   // init parameters
   let sampleRate = sR,
   sign = v => v>0?1:-1,
   startSlide = slide *= 500 * PI2 / sampleRate / sampleRate,
-  startFrequency = frequency *= (1 + randomness*2*M.random() - randomness) * PI2 / sampleRate, b=[], t=0, tm=0, i=0, j=1, r=0, c=0, s=0, f, length;
+  startFrequency = frequency *= PI2 / sampleRate, b=[], t=0, tm=0, i=0, j=1, r=0, c=0, s=0, f, length;
 
   // scale by sample rate
   attack = attack * sampleRate + 9; // minimum attack to prevent pop
@@ -1116,7 +1110,7 @@ fx_bS = (volume, randomness, frequency, attack, sustain, release, shape, shapeCu
         
         s = shape? shape>1? shape>2? shape>3?         // Wave shape
             sin((t%PI2)**3) :                       // 4 noise
-            M.max(min(M.tan(t),1),-1):              // 3 tan
+            max(min(M.tan(t),1),-1):              // 3 tan
             1-(2*t/PI2%2+2)%2:                        // 2 saw
             1-4*abs(M.round(t/PI2)-t/PI2):          // 1 triangle
             sin(t);                                 // 0 sin
@@ -1209,10 +1203,10 @@ ui_hit = (e) => {
     t = button.y;
     if ((x > l) && (x < l + button.w) && (y > t) && (y < t + button.h)) return button; // Return the button that was pressed or released
   }
-  return null; // No button was clicked
+  return 0; // No button was clicked
 },
 // Handle mouse pressed and released events according to the given mode
-ui_mouseHandler = (e, mode = null) => {
+ui_mouseHandler = (e, mode = 0) => {
   if ((!ui_locked) && (e.button == 0)) { // Only process the primary button, and only if there are no transitions in progress
     let widget = ui_hit(e); // Check if the mouse was over any widget when it was pressed or released
     if (widget) {
@@ -1221,12 +1215,12 @@ ui_mouseHandler = (e, mode = null) => {
         if (widget == ui_selected) { // Was the mouse released over the most recently selected widget?
           widget.f(); // Execute widget function
         }
-        ui_selected = null; // Unselect widget
+        ui_selected = 0; // Unselect widget
       } else { // Mouse pressed on a widget
         ui_selected = widget; // Set selected widget
       }
     } else { // Mouse released while the mouse was not over any widget
-      ui_selected = null; // Unselect widget (if one was even selected)
+      ui_selected = 0; // Unselect widget (if one was even selected)
     }
   }
 },
@@ -1256,7 +1250,6 @@ setButtonLabel = (button, label) => {
 // Create a new button at the given coordinates with the given label, that executes the given callback code when it is clicked
 newButton = (x, y, w, s, callback) => {
   let button = getActor(ROLE_BUTTON), // Create the button actor
-
 
   r = getTextureRegion(TR_BUTTON), // Get 3-patch button textureRegion
   canvas = newCanvas(w, 24), // Create a new canvas
@@ -1318,9 +1311,29 @@ showInfo = (s, callback, duration = 2) => {
 fontDescriptor={f:32,h:11,c:[[0,4],[468,3],[0,0],[134,7],[141,7],[46,8],[148,7],[0,0],[442,4],[434,4],[430,4],[389,5],[453,3],[426,4],[462,3],[422,4],[353,6],[418,4],[383,6],[239,6],[245,6],[341,6],[251,6],[257,6],[263,6],[269,6],[450,3],[474,3],[0,0],[394,5],[0,0],[0,0],[10,10],[126,8],[38,8],[62,8],[54,8],[204,7],[211,7],[78,8],[86,8],[471,3],[275,6],[218,7],[281,6],[0,10],[94,8],[118,8],[110,8],[102,8],[70,8],[197,7],[190,7],[183,7],[176,7],[20,9],[169,7],[162,7],[155,7],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[293,6],[299,6],[305,6],[311,6],[317,6],[414,4],[323,6],[329,6],[456,3],[459,3],[335,6],[465,3],[29,9],[347,6],[225,7],[359,6],[287,6],[438,4],[365,6],[446,4],[371,6],[377,6],[232,7],[399,5],[404,5],[409,5]]},
 // #endregion
 
+// Convert HSL to rGB (https://www.30secondsofcode.org/js/s/hsl-to-rgb)
+HSLToRGB = (h, s, l) => {
+  let k = n => (n + h / 30) % 12,
+  a = s * min(l, 1 - l),
+  f = n => l - a * max(-1, min(k(n) - 3, min(9 - k(n), 1)));
+  return [floor(255 * f(0)), floor(255 * f(8)), floor(255 * f(4))];
+},
+
 // #region Planet Generation
 // Procedurally generate a circular planet-like background
 generateBackground = () => {
+
+  let rgb = HSLToRGB(randomAngleDEG(), .48, .63);
+  
+  // let rgb = hsvToRgb(random(), .48, .63);
+  colors[29] = [rgb[0], rgb[1], rgb[2]]; // Set color
+  colors[30] = [floor(rgb[0] / 2), floor(rgb[1] / 2), floor(rgb[2] / 2)]; // Set darker version
+  colors[31] = [floor(rgb[0] / 1.5), floor(rgb[1] / 1.5), floor(rgb[2] / 1.5)]; // Set darker version
+
+  // remappingDescriptors[5][6] = 20;
+  // remap (remappingDescriptors[5], ATLAS.ctx); // Tileset
+
+  remap ([16,0, 288,16, 16,32, 20, 0], ATLAS.ctx); // Tileset
 
   let grid = [],
     n, // Misc vars
@@ -1426,9 +1439,7 @@ generateBackground = () => {
           if (grid[r+1][c] > 0) n += 4; // South
           if (grid[r][c-1] > 0) n += 8; // West
           if (n == 15) { // If the tile is not an edge...
-            if (random() < .15) {
-              n += floor(random() * 4); // 15% of tiles will have extra detail added
-            }
+            if (random() < .15) n += rInt(4); // 15% of tiles will have extra detail added
           }
           grid[r][c] = n; // Overwrite with remapped tile
           // console.log(`c:${c} n:${grid[r-1][c]} e:${grid[r][c + 1]} s:${grid[r+1][c]} w:${grid[r][c-1]} n:${n}`);
@@ -1661,11 +1672,11 @@ updatePlayerScoreLabel = () => {
 // Init a new wave
 nextWave = () => {
 
-  showCursor(false); // Hide the cursor during gameplay
+  showCursor(0); // Hide the cursor during gameplay
 
   resetPool(); // Reset the pool of actors (except the player who never gets recycled)
 
-  logoImage = null; // Stop sparkles spawning
+  logoImage = 0; // Stop sparkles spawning
 
   generateBackground(); // Generate the background
 
@@ -1786,7 +1797,7 @@ nextWave = () => {
 showMenu = () => {
   transition(0, () => {
     ui_locked= 0;
-    showCursor(true);
+    showCursor(1);
   });
 },
 // Fade the diaplsy out, then initialize the required menu (execute its initialization code)
@@ -1816,7 +1827,7 @@ mainMenuButton = () => {
 },
 // Initialize and show the help menu
 helpMenu = () => {
-  logoImage = null;
+  logoImage = 0;
 
   newCenteredTextField('How To PLay', 10, 3)
 
@@ -1857,7 +1868,7 @@ helpMenu = () => {
 };
 // Initialize and show the scores menu
 scoresMenu = () => {
-  logoImage = null;
+  logoImage = 0;
 
   label = HIGH_SCORE_LABEL;
   if (newHigh) {
@@ -1883,7 +1894,7 @@ scoresMenu = () => {
 };
 // Stop sparkles spawning
 stopSparkles = () => {
-  logoImage = null; // Stop sparkles spawning
+  logoImage = 0; // Stop sparkles spawning
 },
 // Initialize and show the options menu
 optionsMenu = () => {
@@ -1983,15 +1994,43 @@ mainMenu = () => {
   });
 
   showMenu();
-};
+}
 // #endregion
 
 // #region Asset Generation
 
+// Perform the actual remmaping using the given descriptor
+remap = (descriptor, ctx) => {
+  palette = palettes[descriptor[6]], // Get the desired palette
+  imageData = ctx.getImageData(descriptor[0], descriptor[1], descriptor[2], descriptor[3]), // Get the image data
+  data = imageData.data; // Get the actual pixel data
+
+  for (let j = 0; j < data.length; j+=4) {
+    let paletteIndex = data[j + 2] - 1; // We only need the blue value
+    if (paletteIndex >= 0) { // Skip zero because it's just transparent
+      let color = colors[palette[paletteIndex]]; // Get the indexed color
+      data[j + 0] = color[0]; // Overwrite existing RGB values with the values from the color
+      data[j + 1] = color[1];
+      data[j + 2] = color[2];
+    }
+  }
+  ctx.putImageData(imageData, descriptor[4], descriptor[5]); // Draw the recolored region to the atlas
+
+  // 
+  // Some descriptors can be used to generate texture regions, saving many bytes of code ;)
+  // 
+
+  if (descriptor[7]) { // Push a new texture region?
+    textureRegions.push([descriptor[4], descriptor[5], descriptor[3], descriptor[3]]); // Push it!
+  }
+};
+
+
+
 // Generate the TextureAtlas and TextureRegions used for all game assets...
 // - Other textures are rendered and recolored as required.
 // - The logo will also be drawn using filled polygons and a gradient.
-let generateAssets = () => {
+generateAssets = () => {
 
   ATLAS = newCanvas(728, 256); // The final texture atlas
 
@@ -2102,32 +2141,6 @@ let generateAssets = () => {
   // and use the previously defined palettes to remap the colors of the rectangles.
   // 
 
-  // Perform the actual remmaping using the given descriptor
-  let remap = (descriptor) => {
-    palette = palettes[descriptor[6]], // Get the desired palette
-    imageData = ctx.getImageData(descriptor[0], descriptor[1], descriptor[2], descriptor[3]), // Get the image data
-    data = imageData.data; // Get the actual pixel data
-
-    for (let j = 0; j < data.length; j+=4) {
-      let paletteIndex = data[j + 2] - 1; // We only need the blue value
-      if (paletteIndex >= 0) { // Skip zero because it's just transparent
-        let color = colors[palette[paletteIndex]]; // Get the indexed color
-        data[j + 0] = color[0]; // Overwrite existing RGB values with the values from the color
-        data[j + 1] = color[1];
-        data[j + 2] = color[2];
-      }
-    }
-    ctx.putImageData(imageData, descriptor[4], descriptor[5]); // Draw the recolored region to the atlas
-
-    // 
-    // Some descriptors can be used to generate texture regions, saving many bytes of code ;)
-    // 
-
-    if (descriptor[7]) { // Push a new texture region?
-      textureRegions.push([descriptor[4], descriptor[5], descriptor[3], descriptor[3]]); // Push it!
-    }
-  };
-
   // Create rainbow font
   for (let i = 0; i < 10; i++) {
     let c = rainbow[i]; // Next color
@@ -2135,12 +2148,12 @@ let generateAssets = () => {
     colors[30] = [floor(c[0] / 3), floor(c[1] / 3), floor(c[2] / 3)]; // Set darker version
     colors[31] = [floor(c[0] / 2), floor(c[1] / 2), floor(c[2] / 2)]; // Set darker version
 
-    remap ([408,16, 8,8, 96 + i * 8,56, 20, 0]); // Sparkle
-    remap ([32,32, 480,13, 32,108 + i * 12, 20, 0]); // Font
+    remap ([408,16, 8,8, 96 + i * 8,56, 20, 0], ctx); // Sparkle
+    remap ([32,32, 480,13, 32,108 + i * 12, 20, 0], ctx); // Font
   }
   
   for (let i = 0; i < remappingDescriptors.length; i++) { // Process all descriptors
-    remap(remappingDescriptors[i]); // Remap next rectangular area of the atlas
+    remap(remappingDescriptors[i], ctx); // Remap next rectangular area of the atlas
   }
 
   // 
@@ -2180,6 +2193,7 @@ let generateAssets = () => {
     n += 25; // Next number to draw
   }
 
+
 //  D.body.appendChild(ATLAS); // REM
 },
 // #endregion
@@ -2190,7 +2204,7 @@ let generateAssets = () => {
 keyDown = (e) => {
   if (keysEnabled) { // Don't do anything if the keyboard is locked
 
-    showCursor(false); // Hide cursor during gameplay (if it is not already hidden)
+    showCursor(0); // Hide cursor during gameplay (if it is not already hidden)
 
     let k = e.keyCode; // Get the key that was pressed or held down
 
@@ -2243,15 +2257,16 @@ keyUp = (e) => {
         lastFrame = Date.now() // Reset elapsed time since last EnterFrame event
         TARGET = PLAYER;
       }
-    } else if (k == 79) {
-      DEBUG = !DEBUG; // Toggle debug info mode
-      if (DEBUG) {
+    } 
+    // else if (k == 79) {
+    //   DEBUG = !DEBUG; // Toggle debug info mode
+    //   if (DEBUG) {
 
-        debugLabel = newTextField('', 4, 20);
-      } else {
-        freeActor(debugLabel);
-      }
-    }
+    //     debugLabel = newTextField('', 4, 20);
+    //   } else {
+    //     freeActor(debugLabel);
+    //   }
+    // }
 
   // 
   // Process key up events when the player got a new high score and is entering their name on the high scores menu
@@ -2398,7 +2413,7 @@ updateGreenIndicator = () => {
   if (greenIndicator && CITIZENS.length > 0) {
     let d,
     distance = 9999,
-    closest = null,
+    closest = 0,
     citizen;
 
     let px = clamp(PLAYER.x, LEFTEDGE, RIGHTEDGE);
@@ -2437,9 +2452,9 @@ explodeActor = (actor) => {
         actor.y - spread + rInt(spread * 2), // y
         0, // direction
         0, // speed
-        false, // fades
+        0, // fades
         1, // alpha
-        false, // shrinks
+        0, // shrinks
         1 + (random() * .5), // scale
         0, // rotRate
         getTextureRegion(data[2]), // TextureRegion
@@ -2457,9 +2472,9 @@ explodeActor = (actor) => {
           actor.y, // y
           a, // direction
           90, // speed
-          false, // fades
+          0, // fades
           1, // alpha
-          true, // shrinks
+          1, // shrinks
           2 + random(), // scale
           0, // rotRate
           [96 + o, 56, 8, 8], // TextureRegion
@@ -2544,7 +2559,7 @@ drawActor = (actor, shadow= 0) => {
       // 
       // Draw the actual image
       // 
-      
+
       CTX.globalAlpha = actor.a * transitionAlpha; // Set alpha
    
       if (actor.r > ROLE_BUTTON) {
@@ -2559,29 +2574,29 @@ drawActor = (actor, shadow= 0) => {
         CTX.rotate(DEGTORAD * rotation);
         drawMain(r[0] + actor.oX, r[1] + actor.oY, r[2], r[3], -actor.rX, -actor.rY);
 
-        if ((DEBUG) && (actor.r == ROLE_ENEMY)) { // Is debug enabled, AND is the actor an enemy?
-          if (actor.t <= ET_SWARMER) { // we only want actual enemies, not enemy bullets
+        // if ((DEBUG) && (actor.r == ROLE_ENEMY)) { // Is debug enabled, AND is the actor an enemy?
+        //   if (actor.t <= ET_SWARMER) { // we only want actual enemies, not enemy bullets
 
-            //CTX.lineWidth = 1;
+        //     //CTX.lineWidth = 1;
 
-            if (actor.T) { // Current target
+        //     if (actor.T) { // Current target
 
-              let a = angleTo(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90, // Calculate angle to target coordinates
-              d = distanceBetween(actor, actor.T);
+        //       let a = angleTo(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90, // Calculate angle to target coordinates
+        //       d = distanceBetween(actor, actor.T);
 
-              CTX.strokeStyle = '#ff0';
-              CTX.beginPath();
-              CTX.moveTo(0, 0);
-              CTX.lineTo(cos(a * DEGTORAD) * d, sin(a * DEGTORAD) * d);
-              CTX.closePath();
-              CTX.stroke();
-            }
+        //       CTX.strokeStyle = '#ff0';
+        //       CTX.beginPath();
+        //       CTX.moveTo(0, 0);
+        //       CTX.lineTo(cos(a * DEGTORAD) * d, sin(a * DEGTORAD) * d);
+        //       CTX.closePath();
+        //       CTX.stroke();
+        //     }
 
-            circle(actor.cR, '#08f'); // Draw a circle centered on the actor wth a radius of its collision radius
+        //     circle(actor.cR, '#08f'); // Draw a circle centered on the actor wth a radius of its collision radius
 
-            circle(actor.R, '#f00'); // Draw a circle centered on the actor wth a radius of its targeting range
-          }
-        }
+        //     circle(actor.R, '#f00'); // Draw a circle centered on the actor wth a radius of its targeting range
+        //   }
+        // }
 
       } else if (actor.r == ROLE_TEXTFIELD) {
 
@@ -2709,9 +2724,9 @@ onEnterFrame = () => {
       // 
 
       if ((doomCounter -= DT) < 0) { // Is it time for aggression?
+        doomCounter += DOOM_DELAY; // Set time till next aggressor spawn
         newEnemy(ET_AGGRESSOR, 0, 0); // Oh yeah...
         fx_play(FX_AGGRESSOR_ALERT); // It's aggressor time!
-        doomCounter += DOOM_DELAY; // Set time till next aggressor spawn
       }
      doomLabel.label = `${floor(doomCounter)}`;
 
@@ -2743,9 +2758,9 @@ onEnterFrame = () => {
                 other.y,
                 -90, // direction
                 500, // speed
-                false, // fades
+                0, // fades
                 1, // alpha
-                false, // shrinks
+                0, // shrinks
                 1, // scale
                 0, // rotRate
                 getTextureRegion(TR_CITIZEN), // TextureRegion
@@ -2760,9 +2775,9 @@ onEnterFrame = () => {
                 other.y, // y
                 -90, // direction
                 15, // speed
-                true, // fades
+                1, // fades
                 1, // alpha
-                false, // shrinks
+                0, // shrinks
                 1, // scale
                 0, // rotRate
                 getTextureRegion(TR_200), // TextureRegion
@@ -2773,9 +2788,10 @@ onEnterFrame = () => {
               if (playerLife < PLAYER_MAX_LIFE) { // Add a life point if player life is less than max
                 playerLife ++; // add life
                 lifeImage.oX = playerLife * 72; // Set atlas x offset
-              } else {
-                // TODO - Award a bonus?
               }
+              //  else {
+              //   // TODO - Award a bonus?
+              // }
             
               // 
               // Check if the wave completed condition is met (all citizens rescued)
@@ -2797,9 +2813,9 @@ onEnterFrame = () => {
                   PLAYER.y, // y
                   PLAYER.rot, // direction
                   500, // speed
-                  false, // fades
+                  0, // fades
                   1, // alpha
-                  false, // shrinks
+                  0, // shrinks
                   1, // scale
                   0, // rotRate
                   getTextureRegion(TR_PLAYER), // TextureRegion
@@ -2819,7 +2835,6 @@ onEnterFrame = () => {
                   });
                 });
 
-
               } else { // The wave is not complete so just play the rescue sound effect
   
                 fx_play(FX_RESCUED); // Play the rescue sound effect
@@ -2833,16 +2848,17 @@ onEnterFrame = () => {
   
               if (!PLAYER.f) { // Is the player currently flashing?
 
-                // While the player is flashing, they can not be damaged
+                // While the player is flashing, they cannot be damaged
 
                 playerLife --; // Subtract life
 
                 fx_play(FX_HIT);
                 
                 lifeImage.oX = playerLife * 72; // Set atlas x offset
+
                 if (playerLife <= 0) {
 
-                  DEBUG= 0; // Disable debug output
+                  // DEBUG= 0; // Disable debug output
 
                   fx_play(FX_GAME_OVER);
 
@@ -2939,9 +2955,9 @@ onEnterFrame = () => {
           PLAYER.y - 2 + rInt(4), // y
           PLAYER.rot + 180, // direction
           150, // speed
-          true, // fades
+          1, // fades
           1, // alpha
-          true, // shrinks
+          1, // shrinks
           1, // scale
           0, // rotRate
           getTextureRegion(TR_THRUST), // TextureRegion
@@ -3085,9 +3101,9 @@ onEnterFrame = () => {
               actor.y - 1 + rInt(2), // y
               actor.rot + 180, // direction
               150, // speed
-              true, // fades
+              1, // fades
               1, // alpha
-              true, // shrinks
+              1, // shrinks
               .5, // scale
               0, // rotRate
               getTextureRegion(TR_THRUST), // TextureRegion
@@ -3123,9 +3139,9 @@ onEnterFrame = () => {
                 other.y, // y
                 -90, // direction
                 15, // speed
-                true, // fades
+                1, // fades
                 1, // alpha
-                false, // shrinks
+                0, // shrinks
                 1, // scale
                 0, // rotRate
                 getTextureRegion(other.pI), // TextureRegion
@@ -3214,9 +3230,9 @@ onEnterFrame = () => {
           logoImage.y - logoImage.tR[3] / 3 + rInt(logoImage.tR[3] * .6), // y
           randomAngleDEG(), // direction
           0, // speed
-          true, // fades
+          1, // fades
           1, // alpha
-          true, // shrinks
+          1, // shrinks
           1, // scale
           640, // rotRate
           getTextureRegion(TR_SPARKLE), // TextureRegion
@@ -3314,7 +3330,7 @@ onEnterFrame = () => {
     // 
 
     for (let i = 0; i < shadowList.length; i++) { // Draw all shadows
-      drawActor(shadowList[i], true); // Draw shadow
+      drawActor(shadowList[i], 1); // Draw shadow
     }
 
     // 
@@ -3348,9 +3364,9 @@ onEnterFrame = () => {
     }
   }
 
-  if (DEBUG) {
-    debugLabel.label = `out:${OUT.length}`;
-  }
+  // if (DEBUG) {
+  //   debugLabel.label = `out:${OUT.length}`;
+  // }
   
   
   requestAnimationFrame(onEnterFrame); // Request the next EnterFrame event
@@ -3399,25 +3415,25 @@ OPTIONS = loadLocalFile('o');
 // 
 
 // fx_add([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]); // FX_NONE
-fx_add([.05,.05,1902,0,.16,0,4,1.15,8.9,0,0,0,0,0,0,.4,0,1,.12,0]); // FX_THRUST
-fx_add([2,0,345,.07,.04,.62,0,1.95,5.7,0,-75,0,.13,0,0,.1,.15,.59,.05,.23]); // FX_RESCUED
-fx_add([2,.05,645,.08,.12,.91,2,1.74,2.2,0,0,.1,.12,0,0,.1,.08,.97,.01,.26]); // FX_WAVE_BEGIN
-fx_add([1,.05,405,.05,.47,.56,2,.16,.1,0,-210,.03,.14,0,0,-0.3,0,.82,.08,0]); // FX_WAVE_END
-fx_add([1.2,0,688,.05,.06,.09,2,.91,-7.9,0,0,0,.08,0,0,0,.01,.79,.02,.3]); // FX_ENEMY_BULLET
-fx_add([.5,0,631,0,.04,.01,2,.32,-5.8,0,0,0,0,0,0,.1,.02,.72,.04,.4]); // FX_PLAYER_BULLET
-fx_add([1,0,549,.03,.05,.42,0,2.88,0,0,0,0,0,.5,2.8,.6,0,.85,.04,0]); // FX_EXPLOSION_1
-fx_add([1,0,286,.02,.06,.04,2,1.64,-4.9,.4,0,0,0,0,0,0,.08,.91,.04,0]); // FX_MINE
-fx_add([1,0,346,.05,.05,.08,3,.51,-8.5,0,0,0,.08,0,0,0,.09,.87,.04,.48]); // FX_BULLET_1
-fx_add([1,0,361,.02,.05,.09,4,1.98,-0.2,.9,0,0,0,0,0,.1,0,.76,.04,0]); // FX_BULLET_3
-fx_add([1.1,0,335,0,.13,.33,1,1.64,.1,0,0,0,0,.2,8.1,.3,0,.65,.04,.27]); // FX_EXPLOSION_2
-fx_add([.5,0,461,.01,.02,.07,4,.29,-2.4,-0.8,0,0,0,0,0,0,.04,.92,.03,0]); // FX_BULLET_2
-fx_add([1,0,92,.02,.03,.01,1,2.3,57,16,46,.04,.02,0,-2.9,0,0,.22,.04,0]); // FX_CLICK
-fx_add([1.1,0,146,.03,.34,.54,0,.86,0,-9.9,149,.03,.03,0,0,0,0,.65,.02,0]); // FX_SWARM_WARNING
-fx_add([2.1,0,114,.06,.49,.39,2,1.33,.9,7.2,-283,.06,.1,0,18,0,.11,.55,.09,0]); // FX_GAME_OVER
-fx_add([1.3,0,93,.05,.07,.08,3,1.57,-1.3,0,0,0,0,0,0,.1,.02,.74,.04,.5]); // FX_MISSILE
-fx_add([1,0,593,.06,.03,.91,2,1.27,0,0,27,.06,0,0,47,.1,0,.64,.07,.26]); // FX_AGGRESSOR_ALERT
-fx_add([1.06,0,353,0,0,.32,2,2.32,-0.2,-1.5,0,0,0,.5,-6.9,.1,0,.8,.08,.04]); // FX_ERROR
-fx_add([1.68,0,428,0,0,.24,4,1.11,8.7,-1.6,0,0,0,.6,0,.2,.02,.65,.09,.07]); // FX_HIT
+fx_add([.05,  1902,0,.16,0,4,1.15,8.9,0,0,0,0,0,0,.4,0,1,.12,0]); // FX_THRUST
+fx_add([2,    345,.07,.04,.62,0,1.95,5.7,0,-75,0,.13,0,0,.1,.15,.59,.05,.23]); // FX_RESCUED
+fx_add([2,    645,.08,.12,.91,2,1.74,2.2,0,0,.1,.12,0,0,.1,.08,.97,.01,.26]); // FX_WAVE_BEGIN
+fx_add([1,    405,.05,.47,.56,2,.16,.1,0,-210,.03,.14,0,0,-0.3,0,.82,.08,0]); // FX_WAVE_END
+fx_add([1,    688,.05,.06,.09,2,.91,-7.9,0,0,0,.08,0,0,0,.01,.79,.02,.3]); // FX_ENEMY_BULLET
+fx_add([.5,   631,0,.04,.01,2,.32,-5.8,0,0,0,0,0,0,.1,.02,.72,.04,.4]); // FX_PLAYER_BULLET
+fx_add([1,    549,.03,.05,.42,0,2.88,0,0,0,0,0,.5,2.8,.6,0,.85,.04,0]); // FX_EXPLOSION_1
+fx_add([1,    286,.02,.06,.04,2,1.64,-4.9,.4,0,0,0,0,0,0,.08,.91,.04,0]); // FX_MINE
+fx_add([1,    346,.05,.05,.08,3,.51,-8.5,0,0,0,.08,0,0,0,.09,.87,.04,.48]); // FX_BULLET_1
+fx_add([1,    361,.02,.05,.09,4,1.98,-0.2,.9,0,0,0,0,0,.1,0,.76,.04,0]); // FX_BULLET_3
+fx_add([1,    335,0,.13,.33,1,1.64,.1,0,0,0,0,.2,8.1,.3,0,.65,.04,.27]); // FX_EXPLOSION_2
+fx_add([.5,   461,.01,.02,.07,4,.29,-2.4,-0.8,0,0,0,0,0,0,.04,.92,.03,0]); // FX_BULLET_2
+fx_add([1,    92,.02,.03,.01,1,2.3,57,16,46,.04,.02,0,-2.9,0,0,.22,.04,0]); // FX_CLICK
+fx_add([1,    146,.03,.34,.54,0,.86,0,-9.9,149,.03,.03,0,0,0,0,.65,.02,0]); // FX_SWARM_WARNING
+fx_add([2,    114,.06,.49,.39,2,1.33,.9,7.2,-283,.06,.1,0,18,0,.11,.55,.09,0]); // FX_GAME_OVER
+fx_add([1.3,  93,.05,.07,.08,3,1.57,-1.3,0,0,0,0,0,0,.1,.02,.74,.04,.5]); // FX_MISSILE
+fx_add([1,    593,.06,.03,.91,2,1.27,0,0,27,.06,0,0,47,.1,0,.64,.07,.26]); // FX_AGGRESSOR_ALERT
+fx_add([1,    353,0,0,.32,2,2.32,-0.2,-1.5,0,0,0,.5,-6.9,.1,0,.8,.08,.04]); // FX_ERROR
+fx_add([1.7,  428,0,0,.24,4,1.11,8.7,-1.6,0,0,0,.6,0,.2,.02,.65,.09,.07]); // FX_HIT
 
 // 
 // Generate a  bunch of random x and y coordinate pairs to represent stars (no z required, it is derived later)
@@ -3458,7 +3474,7 @@ W.onkeydown = keyDown;
 
 W.onmousedown = ui_mouseDown;
 W.onmouseup = ui_mouseUp;
-W.onmousemove = () => {showCursor(true)};
+W.onmousemove = () => {showCursor(1)};
 
 // 
 // Reset the pool, which basically recreates it
@@ -3478,22 +3494,3 @@ mainMenu();
 
 lastFrame = Date.now(); // Set the (fake) last EnterFrame event time
 onEnterFrame(); // Request the first actual EnterFrame event
-
-
-
-  // // Scale the given attribute up
-  // let upScale = (v, scalar) => {
-  //   return (v * .7) + (v * scalar) * .3;
-  // },
-
-  // // Scale the given attribute down
-  // downScale = (v, scalar) => {
-  //   return (v * 2) - (v * scalar);
-  // };
-
-  // let n = 100;
-
-  // for (let i = 0; i < 11; i++) {
-  //   let s = i / 10 * i / 10;
-  //   console.log(downScale(n, s));
-  // }
