@@ -1749,7 +1749,7 @@ nextWave = () => {
 
   rescuedLabel = newTextField(`${rescuedCount}/${citizenCount}` , 4, 4); // Create the label displaying how many citizens have been rescued, and how many in total need to be rescued
 
-  doomCounter = 5;//TIME_TILL_DOOM; // Reset time till next aggressor is spawned
+  doomCounter = TIME_TILL_DOOM; // Reset time till next aggressor is spawned
   doomLabel = newCenteredTextField(`${doomCounter}` , STAGE_SIZE - 13); // Create the label displaying how many seconds before an aggressor is spawned
   doomLabel.z = 10;
 
