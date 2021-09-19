@@ -345,7 +345,8 @@ colors = [
   [79, 79, 79],     // 28 Scout
 
   [], // 29
-  [] // 30
+  [], // 30
+  [] // 31
 
   // More colors will be generated here for the font colors
 ],
@@ -373,7 +374,7 @@ palettes = [
   [4, 5, 6],              // 18 - bullet2 (muon)
   [0, 0, 1],              // 19 - life_grey
   
-  [30, 0, 29]             // 20 - Rainbow font
+  [30, 31, 29]             // 20 - Rainbow font
 ],
 
 // Colors for font generation
@@ -528,10 +529,10 @@ enemyAttributes = [
   [
     TR_AGGRESSOR, // Texture region
     14,           // Collision radius
-    120,          // Max speed
-    PI / 125,     // Turn speed
-    150,          // Targeting range
-    .65,          // Reload duration
+    150,          // Max speed
+    PI / 115,     // Turn speed
+    165,          // Targeting range
+    .5,           // Reload duration
     1,            // Explosion effect
     175,          // Point value
     TR_175        // Point image
@@ -914,8 +915,7 @@ flash = (actor) => {
 // Update the given actors flash state
 doFlash = (actor) => {
   if (actor.f) { // Is the actor currently flashing?
-    actor.fC -= DT; // Countdown till next gap between flashes
-    if (actor.fC <= 0) { // If countdown reaches 0...
+    if ((actor.fC -= DT) <= 0) { // If countdown reaches 0...
       actor.oY = 0; // Y offset in atlas to flashing image
       actor.f= 0; // set actor not flashing
     }
@@ -1075,7 +1075,7 @@ fx_add = (parameters) => {
 // Play the fx with the given name
 fx_play = (index) => {
   if (OPTIONS.a) {
-    if (index > FX_NONE) return fx_pS(fx[index]); // Play the sound if it wasn't FX_NONE
+    if (index > FX_NONE) return fx_pS(fx[index - 1]); // Play the sound if it wasn't FX_NONE
   }
 },
 // Play an array of samples
@@ -1486,7 +1486,7 @@ newEnemy = (type, x, y, a = 0) => {
 
   // Scale the given attribute up
   upScaleAttribute = (v) => {
-    return (v * .5) + (v * waveScalar);
+    return (v * .6) + (v * waveScalar) * .4;
   },
 
   // Scale the given attribute down
@@ -1638,6 +1638,7 @@ newEnemy = (type, x, y, a = 0) => {
     setVelocities();
     enemy.rot = a;
     enemy.ttl = 1.5;
+    enemy.gpc = 0; // Counter for creating exaust trails
     fx_play(FX_MISSILE);
 
   }
@@ -1731,8 +1732,10 @@ nextWave = () => {
   // Spawn enemies
   // 
 
+
   for (let n = 1; n < data.length; n++) { // Range of enemy types to create (ET_SCOUT - ET_ROAMER)
-    for (let i = 0; i < data[n]; i++) { // Number of each enemy type to spawn
+
+    for (let i = 0; i < floor(data[n]) * 2; i++) { // Number of each enemy type to spawn
       newEnemy(n - 1, 0, 0); // Spawn the enemy
     }
   }
@@ -1746,7 +1749,7 @@ nextWave = () => {
 
   rescuedLabel = newTextField(`${rescuedCount}/${citizenCount}` , 4, 4); // Create the label displaying how many citizens have been rescued, and how many in total need to be rescued
 
-  doomCounter = TIME_TILL_DOOM; // Reset time till next aggressor is spawned
+  doomCounter = 5;//TIME_TILL_DOOM; // Reset time till next aggressor is spawned
   doomLabel = newCenteredTextField(`${doomCounter}` , STAGE_SIZE - 13); // Create the label displaying how many seconds before an aggressor is spawned
   doomLabel.z = 10;
 
@@ -2125,12 +2128,15 @@ let generateAssets = () => {
     }
   };
 
+  // Create rainbow font
   for (let i = 0; i < 10; i++) {
     let c = rainbow[i]; // Next color
     colors[29] = [c[0], c[1], c[2]]; // Set color
     colors[30] = [floor(c[0] / 3), floor(c[1] / 3), floor(c[2] / 3)]; // Set darker version
-  
-    remap ([32,32, 480,13, 32,108 + i * 12,    20, 0]);
+    colors[31] = [floor(c[0] / 2), floor(c[1] / 2), floor(c[2] / 2)]; // Set darker version
+
+    remap ([408,16, 8,8, 96 + i * 8,56, 20, 0]); // Sparkle
+    remap ([32,32, 480,13, 32,108 + i * 12, 20, 0]); // Font
   }
   
   for (let i = 0; i < remappingDescriptors.length; i++) { // Process all descriptors
@@ -2145,7 +2151,6 @@ let generateAssets = () => {
   for (let i = 0; i < frames.length; i++) { // Process all frames
     ctx.drawImage(ATLAS, frames[i] * 8,96, 8,8, i * 16 + 4,52, 8,8); // Overlay imagery at correct position
   }
-
   
   // 
   // Draw the life remaining indicator bars at the bottom of thr atlas
@@ -2339,8 +2344,7 @@ fire = (actor, callback) => {
       actor.cF= 0; // Can not fire
       actor.rC = actor.rD; // Reset reloading counter
     } else {
-      actor.rC -= DT // Counting down till reloaded
-      if (actor.rC <= 0) { // Reloaded?
+      if ((actor.rC -= DT) <= 0) { // Reloaded?
         actor.cF = 1; // Can fire next frame
       }
     }
@@ -2442,13 +2446,35 @@ explodeActor = (actor) => {
         4 // Frames
       );
     }
+
+    if (actor.t <= ET_SWARMER) { //' Is the enemy NOT a bullet?
+      let a = randomAngleDEG(), // Pick a random start angle
+      o = rInt(9) * 8; // Random x offset for different colored particles
+      for (let j = 0; j < 8; j++) { // Spawn this many particles in a circular spread
+        newParticle(
+          .35, // ttl
+          actor.x, // x
+          actor.y, // y
+          a, // direction
+          90, // speed
+          false, // fades
+          1, // alpha
+          true, // shrinks
+          2 + random(), // scale
+          0, // rotRate
+          [96 + o, 56, 8, 8], // TextureRegion
+          0 // Frames
+        );
+        a += 45;
+      }
+    }
+
     if (onScreen(actor)) fx_play(data[3]); // Play effect if the actor is visible to the player
   }
 },
 // Decrement given actors time to live and when it reaches zero... make it explode using its explosion effect
 expireActor = (actor) => {
-  actor.ttl -= DT; // Decrement time to live
-  if (actor.ttl <= 0) { // Expired?
+  if (( actor.ttl -= DT) <= 0) { // Expired?
     explodeActor(actor); // Explode!
     freeActor(actor); // Recycle
   }
@@ -2682,8 +2708,7 @@ onEnterFrame = () => {
       // This next part is not player related but mashed in here so it doesn;t happen when a menu is visible :D
       // 
 
-      doomCounter -= DT; // Increment wave timer
-      if (doomCounter < 0) { // Is it time for aggression?
+      if ((doomCounter -= DT) < 0) { // Is it time for aggression?
         newEnemy(ET_AGGRESSOR, 0, 0); // Oh yeah...
         fx_play(FX_AGGRESSOR_ALERT); // It's aggressor time!
         doomCounter += DOOM_DELAY; // Set time till next aggressor spawn
@@ -2894,8 +2919,7 @@ onEnterFrame = () => {
 
       }
     } else { // The player is reloading
-      playerReloadCounter -= DT; // Countdown till next possibility to fire
-      if (playerReloadCounter <= 0) playerCanFire = 1; // If the counter is equal to or less than 0, the player can fire another bullet
+      if ((playerReloadCounter -= DT) <= 0) playerCanFire = 1; // If the counter is equal to or less than 0, the player can fire another bullet
     }
     // #endregion
 
@@ -2907,13 +2931,12 @@ onEnterFrame = () => {
       PLAYER.vX = clamp(PLAYER.vX + cos(PLAYER.rot * DEGTORAD) * 4, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY); // Increment velocity in the direction that the player is facing
       PLAYER.vY = clamp(PLAYER.vY + sin(PLAYER.rot * DEGTORAD) * 4, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
 
-      playerThrustDelay -= DT; // Spawn thrust particles at regular intervals
-      if (playerThrustDelay < 0) {
+      if ((playerThrustDelay -= DT) < 0) { // Spawn thrust particles at regular intervals
         playerThrustDelay = 0.025; // Time between thrust particle emissions
         newParticle(
           .35, // ttl
-          PLAYER.x - 2 + random() * 4, // x
-          PLAYER.y - 2 + random() * 4, // y
+          PLAYER.x - 2 + rInt(4), // x
+          PLAYER.y - 2 + rInt(4), // y
           PLAYER.rot + 180, // direction
           150, // speed
           true, // fades
@@ -2952,8 +2975,7 @@ onEnterFrame = () => {
         if (actor.fa) actor.a = actor.a2 * ratio; // Scale alpha
         if (actor.sh) actor.s = actor.s2 * ratio; // Scale size
         if (actor.frames > 0) setTextureRegion(actor, [actor.iX + (actor.tR[2] * clamp(actor.frames - floor(actor.frames * ratio) - 1, 0, actor.frames - 1)), actor.tR[1], actor.tR[2], actor.tR[3]]); // Don't ask. Just accept that this code animates a particle over time, and move on with your life :D
-        actor.gpc -= DT; // Decrement ttl
-        if (actor.gpc <= 0) freeActor(actor) // If the ttl reaches 0 or below, just recycle the actor, effectively removing it from the scene
+        if ((actor.gpc -= DT) <= 0) freeActor(actor) // If the ttl reaches 0 or below, just recycle the actor, effectively removing it from the scene
 
       } else if (actor.r == ROLE_ENEMY && aiEnabled) {
         
@@ -3003,8 +3025,7 @@ onEnterFrame = () => {
           
           actor.T = actor.tD[actor.wT % 2]; // Get the current target coordinates (0 or 1)
 
-          actor.sT -= DT; // Countdown till next mine is laid
-          if (actor.sT <= 0) { // Can the actor spawn a new mine?
+          if ((actor.sT -= DT) <= 0) { // Can the actor spawn a new mine?
             actor.sT = 5 +random() * 5; // Reset spawn timer
             newEnemy(ET_MINE, actor.x, actor.y, (actor.rot - 90) + rInt(180)); // Spawn a new mine
             if (onScreen(actor)) fx_play(FX_MINE); // Play the mine spawning sound if the actor is visible to the player
@@ -3053,6 +3074,26 @@ onEnterFrame = () => {
         } else { // It must be ET_BULLET1, ET_BULLET2, and ET_BULLET3
           // All enemy bullets just travel in a straight line at their velocity until they expire, or collide with the player
           applyVelocities(actor);
+
+//          console.log(actor);
+
+          if (actor.t == ET_MISSILE) {
+            console.log(actor.gpc);
+            newParticle(
+              .1, // ttl
+              actor.x - 1 + rInt(2), // x
+              actor.y - 1 + rInt(2), // y
+              actor.rot + 180, // direction
+              150, // speed
+              true, // fades
+              1, // alpha
+              true, // shrinks
+              .5, // scale
+              0, // rotRate
+              getTextureRegion(TR_THRUST), // TextureRegion
+              0 // Frames
+            );
+          }
           expireActor(actor);
         }
  
@@ -3063,11 +3104,11 @@ onEnterFrame = () => {
         // Player bullets move forward at their set velocities and collide with enemies.
         // 
 
-        actor.ttl -= DT; // Decrement time to live
-        if (actor.ttl <= 0) { // Expired?
+        if ((actor.ttl -= DT) <= 0) { // Expired?
           explodeActor(actor); // Spawn explosion effects
           freeActor(actor); // Recycle
         } else { // The bullet is still alive
+
           applyVelocities(actor); // Move the bullet
           collider(ROLE_ENEMY, () => { // Check for and resolve collisions between player bullets and enemies
             collisionList.splice(collisionList.indexOf(other), 1); // Remove actor from list
@@ -3104,8 +3145,7 @@ onEnterFrame = () => {
         // Process citizen AI
         // 
 
-        actor.aC -= DT; // Decrement animation counter
-        if (actor.aC <= 0) { // Ready to advace the frame?
+        if ((actor.aC -= DT) <= 0) { // Ready to advace the frame?
           actor.aC += 1/8; // Reset counter till next frame change
           actor.cAF += 1; // Increment animation frame
           if (actor.cAF == actor.nAF) actor.cAF = 0; // Reset to the first frame if it reached the last frame
@@ -3154,8 +3194,7 @@ onEnterFrame = () => {
     // 
 
     if (BUTTONS.length > 0) {
-      starCounter -= DT; // Countdown till next change
-      if (starCounter < 0) {
+      if ((starCounter -= DT) < 0) {
         starCounter = 0.25; // Reset countdown
         starColors = starPalettes[rInt(2) + 1]; // Change the colors
       }
@@ -3166,8 +3205,7 @@ onEnterFrame = () => {
     // 
 
     if (logoImage) {
-      sparkleCounter -= DT;
-      if (sparkleCounter < 0) {
+      if ((sparkleCounter -= DT) < 0) {
         sparkleCounter = random() * 2;
 
         newParticle(
@@ -3297,8 +3335,7 @@ onEnterFrame = () => {
 
   if (transitioning) { // Is the application transitioning between scenes?
     if (transitioningIn) {
-      transitionAlpha -= DT * 2; // Make the vignette more transparent
-      if (transitionAlpha <= 0) { // Is the vignette fully transparent?
+      if ((transitionAlpha -= DT * 2) <= 0) { // Is the vignette fully transparent?
         transitionAlpha = 0; // Set transparent
         transitionComplete(); // Call code
       }
@@ -3361,7 +3398,7 @@ OPTIONS = loadLocalFile('o');
 // Create sound effects
 // 
 
-fx_add([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]); // FX_NONE
+// fx_add([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]); // FX_NONE
 fx_add([.05,.05,1902,0,.16,0,4,1.15,8.9,0,0,0,0,0,0,.4,0,1,.12,0]); // FX_THRUST
 fx_add([2,0,345,.07,.04,.62,0,1.95,5.7,0,-75,0,.13,0,0,.1,.15,.59,.05,.23]); // FX_RESCUED
 fx_add([2,.05,645,.08,.12,.91,2,1.74,2.2,0,0,.1,.12,0,0,.1,.08,.97,.01,.26]); // FX_WAVE_BEGIN
@@ -3442,33 +3479,21 @@ mainMenu();
 lastFrame = Date.now(); // Set the (fake) last EnterFrame event time
 onEnterFrame(); // Request the first actual EnterFrame event
 
-let q = .5;
-if (q -= 1 < 0) {
-  console.log(q);
-}
 
-let w = .5;
-w -= 1;
-if (w < 0) {
-  console.log(w);
-}
 
-let arr = [1, 2, 3];
+  // // Scale the given attribute up
+  // let upScale = (v, scalar) => {
+  //   return (v * .7) + (v * scalar) * .3;
+  // },
 
-// for (let i = 0; i < 10; i++) {
-//   console.log(i);
-// }
-// let n = 0;
-// while (n < 10) {
-//   console.log(n);
-// }
+  // // Scale the given attribute down
+  // downScale = (v, scalar) => {
+  //   return (v * 2) - (v * scalar);
+  // };
 
-// for...of loop
-for(let e of arr) {
-  console.log(e);
-}
+  // let n = 100;
 
-// // .forEach() method
-// arr.forEach((e) => {
-//   console.log(e);
-// });
+  // for (let i = 0; i < 11; i++) {
+  //   let s = i / 10 * i / 10;
+  //   console.log(downScale(n, s));
+  // }

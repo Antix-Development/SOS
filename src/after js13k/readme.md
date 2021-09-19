@@ -27,5 +27,43 @@ It might be worth investigating whay it fails so terribly in Chrome as I think I
 
 - Replaced the actors single `iR` (imageRadius) variable with `rX` (radiusX) and `rY` (radiusY) to better accomodate rectangular images.
 
-I've now decided to now shelve SOS and work on my 2D gaming engine since there is no requirement to be creating tiny code for now. I'm really looking forward to js13k competition 2022 however, see you all there!
+- I've now decided to now shelve SOS and work on my 2D gaming engine since there is no requirement to be creating tiny code for now. I'm really looking forward to js13k competition 2022 however, see you all there!
+
+
+**16/9/2021**
+
+- On the flight back from Rarotonga to New Zealand I played many games of SOS, and to music. During this time I thought that it might be good if the game was overall more difficult to begin with, had more enemies to blast, and had some more effects when destroying enemies.
+
+**19/9/2021**
+
+- Doubled the number of enemies spawned in every wave.
+
+- Discovered a miscalculation in the difficulty scaling in `upscaleAttribute()` where the range was between 50% and 150%, instead of 50% to 100% (whoops).
+
+- Changed difficulty scaling so enemies scale between 60% and 100% of their maximum difficulty over time.
+
+- Aggressors are now slightly more aggressive!
+
+- Took a random small explosion frame and created 10 rainbow colored versions (like the font) which are now used as extra particles when enemies are destroyed.
+
+- Missiles fired by the Aggressor now have trails.
+
+- Discovered that the following two conditional blocks of code are basically the same... but the second one is less code, so I replaced them all with the smaller versions.
+````JavaScript
+	counter -= DT;
+	if (counter < 0) {
+		// execute code
+	);
+
+  // Same but using less code
+	if ((counter -= DT) < 0) {
+		// execute code
+	);
+
+````
+
+- All of the above takes the final zip file to 13,302 bytes, still within js13k limits... by 10 bytes!
+
+- I am still wondering if I can get SOS working in Chrome when using Roadroller, as currently SOS only works correctly in Firefox after being road-rolled.
+
 </div>
