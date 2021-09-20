@@ -36,9 +36,8 @@ FLASH_DURATION = 0.075, // Duration of flash when any given actor is flashing
 // #endregion
 
 // #region Debugging
-// DEBUG= 0,
-// debugLabel,
-
+DEBUG= 0,
+debugLabel,
 // #endregion
 
 // #region Menus
@@ -64,7 +63,7 @@ controlThrustButton,
 controlFireButton,
 controlButton,
 
-mainMenu,
+// mainMenu,
 
 SCORES,
 scoreTiteLabel, // The title of the high scores menu
@@ -153,23 +152,24 @@ renderList = [], // List of actors that will be drawn in the current frame
 
 // #region Collision Variables
 collisionList = [], // List of actors that can be colliding next frame
-collisionEnabled= 0,
+collisionEnabled = 0,
 // #endregion
 
 // #region Game State variables
 DT, // Milliseconds elapsed since last EnterFrame event
 thisFrame, // Date of current EnterFrame event
 lastFrame, // Date of last EnterFrame event
-paused= 0, // True if the application is in the paused state (where enemy and bullet AI is suspended)
+paused = 0, // True if the application is in the paused state (where enemy and bullet AI is suspended)
 
-keysEnabled= 0, // True to enable keyboard input
+keysEnabled = 0, // True to enable keyboard input
 cursorVisible = 1, // True if the pointer is visible
 
 transitionAlpha = 1,
-transitioningIn= 0,
-transitioning= 0, // True if fading scene in or out
+transitionDirection = 0,
+transitioning = 0, // True if fading scene in or out
 onTransitionComplete = 0,
-aiEnabled= 0, // True if enemy and bullet actors can update their states
+aiEnabled = 0, // True if enemy and bullet actors can update their states
+
 // #endregion
 
 // #region User Interface Variables
@@ -626,82 +626,82 @@ WD_ROAMER_COUNT     = 4,
 waveData = [
   [ // 0
     3,  // Citizens
-    4,  // Scouts
-    3,  // Bombers
-    1,  // Carriers
-    5   // Roamers
+    8,  // Scouts
+    6,  // Bombers
+    2,  // Carriers
+    10   // Roamers
   ],
 
   [ // 1
     4,  // Citizens
-    6,  // Scouts
-    4,  // Bombers
-    1,  // Carriers
-    6   // Roamers
+    12,  // Scouts
+    8,  // Bombers
+    2,  // Carriers
+    12   // Roamers
   ],
 
   [ // 2
     5,  // Citizens
-    8,  // Scouts
-    4,  // Bombers
-    2,  // Carriers
-    7   // Roamers
+    16,  // Scouts
+    8,  // Bombers
+    4,  // Carriers
+    14   // Roamers
   ],
 
   [ // 3
     6,  // Citizens
-    10, // Scouts
-    5,  // Bombers
-    2,  // Carriers
-    8   // Roamers
+    20, // Scouts
+    10,  // Bombers
+    4,  // Carriers
+    16   // Roamers
   ],
 
   [ // 4
     7,  // Citizens
-    12, // Scouts
-    5,  // Bombers
-    2,  // Carriers
-    9   // Roamers
+    24, // Scouts
+    10,  // Bombers
+    4,  // Carriers
+    18   // Roamers
   ],
 
   [ // 5
     8,  // Citizens
-    13, // Scouts
-    5,  // Bombers
-    3,  // Carriers
-    10  // Roamers
+    26, // Scouts
+    10,  // Bombers
+    6,  // Carriers
+    20  // Roamers
   ],
   
   [ // 6
     9,  // Citizens
-    14, // Scouts
-    6,  // Bombers
-    3,  // Carriers
-    11  // Roamers
+    28, // Scouts
+    12,  // Bombers
+    6,  // Carriers
+    22  // Roamers
   ],
 
   [ // 7
     10, // Citizens
-    15, // Scouts
-    6,  // Bombers
-    3,  // Carriers
-    12  // Roamers
+    30, // Scouts
+    12,  // Bombers
+    6,  // Carriers
+    24  // Roamers
   ],
 
   [ // 8
     10, // Citizens
-    15, // Scouts
-    7,  // Bombers
-    4,  // Carriers
-    13  // Roamers
+    30, // Scouts
+    14,  // Bombers
+    8,  // Carriers
+    26  // Roamers
   ],
 
   [ // 9
     10, // Citizens
-    15, // Scouts
-    8,  // Bombers
-    5,  // Carriers
-    14  // Roamers
+    30, // Scouts
+    16,  // Bombers
+    10,  // Carriers
+    28  // Roamers
   ]
 ],
 // #endregion
@@ -838,11 +838,15 @@ addNewScore = (name, score) => {
   let newScore = { // Create a new score
     n: name,
     s: score,
-  }
+  };
+
   SCORES.push(newScore); // Append the new score to the list
-  SCORES.sort((a, b) => (a.s < b.s)  ? 1 : -1); // Sort
+
+  SCORES.sort(function poop(a, b) {return a.s < b.s}); // Sort
+  // SCORES.sort((a, b) => (a.s < b.s)  ? 1 : -1); // Sort
+  
   SCORES.length = 5; // Nasty truncation
-  return newScore; // Required for hichscore checking
+  return newScore; // Required for highscore checking
 },
 // #endregion
 
@@ -1154,19 +1158,24 @@ fx_bS = (volume, frequency, attack, sustain, release, shape, shapeCurve, slide, 
 },
 // #endregion
 
+transitions = [],
+transitionCallbacks = [],
+
 // #region Scene Transition
 // Begin a scene transition. Basically this sets a global alpha value that is applied to every actor that is drawn, effectively alpha fading the entire scene in and out
 transition = (direction, callback) => {
   ui_locked = 1; // Disable button clicking
-  keysEnabled= 0; // disable keyboard input
+  keysEnabled = 0; // disable keyboard input
   transitionAlpha = direction; // Set alpha
-  transitioningIn = direction; // Set fading in or out
+  transitionDirection = direction; // Set fading in or out
   onTransitionComplete = callback; // Save callback code
   transitioning = 1; // Set application to be transitioning
 },
 // A transition has completed, set application to not be transitioning, and call onTransitionComplete code
 transitionComplete = () => {
-  transitioning= 0;
+
+  transitioning = 0;
+
   onTransitionComplete(); // Call code
 },
 // #endregion
@@ -1206,17 +1215,25 @@ ui_hit = (e) => {
   return 0; // No button was clicked
 },
 // Handle mouse pressed and released events according to the given mode
-ui_mouseHandler = (e, mode = 0) => {
+ui_mouseHandler = (e, buttonUp) => {
   if ((!ui_locked) && (e.button == 0)) { // Only process the primary button, and only if there are no transitions in progress
+
     let widget = ui_hit(e); // Check if the mouse was over any widget when it was pressed or released
     if (widget) {
-      if (mode) { // null = pressed, 1 = released
+      if (buttonUp) { // 0 = pressed, 1 = released
+        // 
         // Mouse released on a widget
-        if (widget == ui_selected) { // Was the mouse released over the most recently selected widget?
-          widget.f(); // Execute widget function
-        }
+        // 
+
+        if (widget == ui_selected) widget.f(); // Execute widget function
         ui_selected = 0; // Unselect widget
-      } else { // Mouse pressed on a widget
+      
+      } else {
+
+        // 
+        // Mouse pressed on a widget
+        // 
+
         ui_selected = widget; // Set selected widget
       }
     } else { // Mouse released while the mouse was not over any widget
@@ -1226,7 +1243,7 @@ ui_mouseHandler = (e, mode = 0) => {
 },
 // Pass the event and mode to the handler for mouse down events
 ui_mouseDown = (e) => {
-  ui_mouseHandler(e);
+  ui_mouseHandler(e, 0);
 },
 // Pass the event and mode to the handler for mouse up events
 ui_mouseUp = (e) => {
@@ -1270,9 +1287,9 @@ newButton = (x, y, w, s, callback) => {
   setTextureRegion(button, [0, 0, w, 24]); // Create and save a textureRegion
 
   ctx.drawImage(ATLAS, r[0],r[1], 6,24, 0,0, 6,24); // Draw left button bit...
-  // ctx.drawImage(ATLAS, r[0] + 6,r[1], 1,24, 6,0, w-12,24); // Middle button bit...
+  ctx.drawImage(ATLAS, r[0] + 6,r[1], 1,24, 6,0, w-12,24); // Middle button bit...
 
-  setButtonLabel(button, s);
+  setButtonLabel(button, s); // Draw middle bit and draw label
 
   ctx.drawImage(ATLAS, r[0] + 7,r[1], 6,24, w-6, 0, 6,24); // And right button bit
   // ui_renderString(floor((w - ui_strWidth(s)) / 2), floor((24 - fontDescriptor.h) / 2) + 1, s, ctx); // Render the string into the canvas
@@ -1323,18 +1340,6 @@ HSLToRGB = (h, s, l) => {
 // Procedurally generate a circular planet-like background
 generateBackground = () => {
 
-  let rgb = HSLToRGB(randomAngleDEG(), .48, .63);
-  
-  // let rgb = hsvToRgb(random(), .48, .63);
-  colors[29] = [rgb[0], rgb[1], rgb[2]]; // Set color
-  colors[30] = [floor(rgb[0] / 2), floor(rgb[1] / 2), floor(rgb[2] / 2)]; // Set darker version
-  colors[31] = [floor(rgb[0] / 1.5), floor(rgb[1] / 1.5), floor(rgb[2] / 1.5)]; // Set darker version
-
-  // remappingDescriptors[5][6] = 20;
-  // remap (remappingDescriptors[5], ATLAS.ctx); // Tileset
-
-  remap ([16,0, 288,16, 16,32, 20, 0], ATLAS.ctx); // Tileset
-
   let grid = [],
     n, // Misc vars
     r,
@@ -1349,7 +1354,19 @@ generateBackground = () => {
           grid[y + HALF_GRID_SIZE][c] = 1; // Set cell as "alive"
         }
       }
-    };
+    },
+
+    rgb = HSLToRGB(randomAngleDEG(), .48, .63);
+  
+    // let rgb = hsvToRgb(random(), .48, .63);
+    colors[29] = [rgb[0], rgb[1], rgb[2]]; // Set color
+    colors[30] = [floor(rgb[0] / 2), floor(rgb[1] / 2), floor(rgb[2] / 2)]; // Set darker version
+    colors[31] = [floor(rgb[0] / 1.5), floor(rgb[1] / 1.5), floor(rgb[2] / 1.5)]; // Set darker version
+  
+    // remappingDescriptors[5][6] = 20;
+    // remap (remappingDescriptors[5], ATLAS.ctx); // Tileset
+  
+    remap ([16,0, 288,16, 16,32, 20, 0], ATLAS.ctx); // Tileset
 
     // 
     // Populate the grid with empty rows
@@ -1702,8 +1719,8 @@ nextWave = () => {
   PLAYER.vY = 0;
   PLAYER.v = 1; // Is visible
   playerCanFire = 1; // Can fire
-  playerFiring= 0; // But is not currently firing
-  PLAYER.f= 0; // Not flashing
+  playerFiring = 0; // But is not currently firing
+  PLAYER.f = 0; // Not flashing
   playerLife = PLAYER_MAX_LIFE; // Reset life to max
 
   // 
@@ -1730,7 +1747,7 @@ nextWave = () => {
     setTextureRegion(citizen, getTextureRegion(TR_CITIZEN)); // Set texture region
     citizen.cR = 6; // Set collision radius
 
-    citizen.rescued= 0;
+    citizen.rescued = 0;
 
     randomizePosition(citizen); // Place the citizen at random coordinates
 
@@ -1743,10 +1760,8 @@ nextWave = () => {
   // Spawn enemies
   // 
 
-
   for (let n = 1; n < data.length; n++) { // Range of enemy types to create (ET_SCOUT - ET_ROAMER)
-
-    for (let i = 0; i < floor(data[n]) * 2; i++) { // Number of each enemy type to spawn
+    for (let i = 0; i < data[n]; i++) { // Number of each enemy type to spawn
       newEnemy(n - 1, 0, 0); // Spawn the enemy
     }
   }
@@ -1796,7 +1811,7 @@ nextWave = () => {
 // Fade the menu in, enable button clicking, and show the mouse pointer
 showMenu = () => {
   transition(0, () => {
-    ui_locked= 0;
+    ui_locked = 0;
     showCursor(1);
   });
 },
@@ -1814,12 +1829,12 @@ mainMenuButton = () => {
   newButton(64, 215, 128, 'Main Menu', () => { // Main menu button
     if (newHigh) { // Was there a new high score?
       saveScores(); // Save high scores
-      newHigh= 0; // Set state to no new high score
-      enteringName= 0 // Not entering a name
+      newHigh = 0; // Set state to no new high score
+      enteringName = 0 // Not entering a name
     }
     helpImages = []; // Clear help images
-    controlsChanged= 0;
-    awaitingControlKey= 0;
+    controlsChanged = 0;
+    awaitingControlKey = 0;
 
     if (optionsChanged) saveOptions(); // Save options if required
     changeMenu(mainMenu); // Go to the main menu
@@ -1834,7 +1849,7 @@ helpMenu = () => {
   newCenteredTextField('Follow the    and rescue the     ', 40);
   newImage(101, 45, TR_INDICATOR_GREEN);
 
- newImage(216, 45, TR_CITIZEN);
+  newImage(216, 45, TR_CITIZEN);
 
   newCenteredTextField('Avoid or Engage Enemies', 70);
 
@@ -1851,7 +1866,6 @@ helpMenu = () => {
 
   newTextField('Mine', 205, 105, 2);
   helpImages.push(newImage(220, 130, TR_MINE));
-
 
   newTextField('Bomber', 17, 155, 2);
   helpImages.push(newImage(40, 185, TR_BOMBER));
@@ -2025,8 +2039,6 @@ remap = (descriptor, ctx) => {
   }
 };
 
-
-
 // Generate the TextureAtlas and TextureRegions used for all game assets...
 // - Other textures are rendered and recolored as required.
 // - The logo will also be drawn using filled polygons and a gradient.
@@ -2193,7 +2205,6 @@ generateAssets = () => {
     n += 25; // Next number to draw
   }
 
-
 //  D.body.appendChild(ATLAS); // REM
 },
 // #endregion
@@ -2228,8 +2239,6 @@ keyDown = (e) => {
 },
 // Handle key up events
 keyUp = (e) => {
-  // log(e);
-
   k = e.keyCode; // Get the key that was released
 
   if (keysEnabled) {  // Don't do anything if the keyboard is locked
@@ -2244,12 +2253,12 @@ keyUp = (e) => {
 
     } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // "CTRL"
 
-      playerThrusting= 0; // Stop player thrusting
+      playerThrusting = 0; // Stop player thrusting
       playerThrustDelay = 0;
 
     } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // "SPACE"
 
-      playerFiring= 0;
+      playerFiring = 0;
 
     } else if (k == 80) { // p
       paused = !paused; // Toggle paused state
@@ -2257,16 +2266,15 @@ keyUp = (e) => {
         lastFrame = Date.now() // Reset elapsed time since last EnterFrame event
         TARGET = PLAYER;
       }
-    } 
-    // else if (k == 79) {
-    //   DEBUG = !DEBUG; // Toggle debug info mode
-    //   if (DEBUG) {
+    } else if (k == 79) {
+      DEBUG = !DEBUG; // Toggle debug info mode
+      if (DEBUG) {
 
-    //     debugLabel = newTextField('', 4, 20);
-    //   } else {
-    //     freeActor(debugLabel);
-    //   }
-    // }
+        debugLabel = newTextField('', 4, 20);
+      } else {
+        freeActor(debugLabel);
+      }
+    }
 
   // 
   // Process key up events when the player got a new high score and is entering their name on the high scores menu
@@ -2303,7 +2311,7 @@ keyUp = (e) => {
     OPTIONS.c[controlIndex].c = e.code;
     OPTIONS.c[controlIndex].k = k;
     optionsChanged = 1; // Options will be saved when options menu closed
-    awaitingControlKey= 0; // No longer waiting for this event
+    awaitingControlKey = 0; // No longer waiting for this event
   }
 },
 // #endregion 
@@ -2320,7 +2328,7 @@ seek = (actor) => {
   if (rot != targetAngle) { // Is the actor already facing directly at the target?
     // No... steer towards the target
 
-    actor.fT= 0; // True if actor is facing directly at the target
+    actor.fT = 0; // True if actor is facing directly at the target
 
     diff = targetAngle - rot; // Calculate difference between the current angle and targetAngle
   
@@ -2356,7 +2364,7 @@ fire = (actor, callback) => {
     if (actor.cF) { // Can the actor fire?
       // YES! Fire!!
       callback();
-      actor.cF= 0; // Can not fire
+      actor.cF = 0; // Can not fire
       actor.rC = actor.rD; // Reset reloading counter
     } else {
       if ((actor.rC -= DT) <= 0) { // Reloaded?
@@ -2414,10 +2422,10 @@ updateGreenIndicator = () => {
     let d,
     distance = 9999,
     closest = 0,
-    citizen;
+    citizen,
 
-    let px = clamp(PLAYER.x, LEFTEDGE, RIGHTEDGE);
-    let py = clamp(PLAYER.y, LEFTEDGE, RIGHTEDGE);
+    px = clamp(PLAYER.x, LEFTEDGE, RIGHTEDGE),
+    py = clamp(PLAYER.y, LEFTEDGE, RIGHTEDGE);
 
     for (let i = 0; i < CITIZENS.length; i++) {
       citizen = CITIZENS[i];
@@ -2462,7 +2470,7 @@ explodeActor = (actor) => {
       );
     }
 
-    if (actor.t <= ET_SWARMER) { //' Is the enemy NOT a bullet?
+    if ((actor.r == ROLE_ENEMY) && (actor.t <= ET_SWARMER)) { //' Is the enemy NOT a bullet?
       let a = randomAngleDEG(), // Pick a random start angle
       o = rInt(9) * 8; // Random x offset for different colored particles
       for (let j = 0; j < 8; j++) { // Spawn this many particles in a circular spread
@@ -2521,7 +2529,7 @@ moveAndConstrain = (actor) => {
   }
 },
 // Draw the given actor to the display as a shadow, or as the actual image
-drawActor = (actor, shadow= 0) => {
+drawActor = (actor, shadow = 0) => {
 
   // Draw a circle centered on the actor with the given radius and given color
   let circle = (r, c) => {
@@ -2548,7 +2556,7 @@ drawActor = (actor, shadow= 0) => {
       // Draw a shadow
       // 
 
-      CTX.globalAlpha = 0.25 * transitionAlpha;
+      CTX.globalAlpha = .25 * transitionAlpha;
       CTX.translate(lX - 4 , lY + 4); // Apply transformations
       CTX.rotate(DEGTORAD * rotation);
       
@@ -2574,29 +2582,27 @@ drawActor = (actor, shadow= 0) => {
         CTX.rotate(DEGTORAD * rotation);
         drawMain(r[0] + actor.oX, r[1] + actor.oY, r[2], r[3], -actor.rX, -actor.rY);
 
-        // if ((DEBUG) && (actor.r == ROLE_ENEMY)) { // Is debug enabled, AND is the actor an enemy?
-        //   if (actor.t <= ET_SWARMER) { // we only want actual enemies, not enemy bullets
+        if ((DEBUG) && (actor.r == ROLE_ENEMY)) { // Is debug enabled, AND is the actor an enemy?
+          if (actor.t <= ET_SWARMER) { // we only want actual enemies, not enemy bullets
 
-        //     //CTX.lineWidth = 1;
+            if (actor.T) { // Current target
 
-        //     if (actor.T) { // Current target
+              let a = angleTo(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90, // Calculate angle to target coordinates
+              d = distanceBetween(actor, actor.T);
 
-        //       let a = angleTo(actor.T.y - actor.lY, actor.T.x - actor.lX) - 90, // Calculate angle to target coordinates
-        //       d = distanceBetween(actor, actor.T);
+              CTX.strokeStyle = '#ff0';
+              CTX.beginPath();
+              CTX.moveTo(0, 0);
+              CTX.lineTo(cos(a * DEGTORAD) * d, sin(a * DEGTORAD) * d);
+              CTX.closePath();
+              CTX.stroke();
+            }
 
-        //       CTX.strokeStyle = '#ff0';
-        //       CTX.beginPath();
-        //       CTX.moveTo(0, 0);
-        //       CTX.lineTo(cos(a * DEGTORAD) * d, sin(a * DEGTORAD) * d);
-        //       CTX.closePath();
-        //       CTX.stroke();
-        //     }
+            circle(actor.cR, '#08f'); // Draw a circle centered on the actor wth a radius of its collision radius
 
-        //     circle(actor.cR, '#08f'); // Draw a circle centered on the actor wth a radius of its collision radius
-
-        //     circle(actor.R, '#f00'); // Draw a circle centered on the actor wth a radius of its targeting range
-        //   }
-        // }
+            circle(actor.R, '#f00'); // Draw a circle centered on the actor wth a radius of its targeting range
+          }
+        }
 
       } else if (actor.r == ROLE_TEXTFIELD) {
 
@@ -2616,19 +2622,20 @@ drawActor = (actor, shadow= 0) => {
         CTX.rotate(DEGTORAD * (rotation - 90)); // Unrotate for images
         drawMain(r[0] + actor.oX, r[1] + actor.oY, r[2], r[3], -r[2] / 2, -r[3] / 2);
 
-      } else { // It has to be a button
+      // } else { // It has to be a button
+      } else if (actor.r == ROLE_BUTTON) {
 
         // 
         // Draw a button
         // 
 
         let x = actor.x, // Get coordinates
-        y = actor.y;
-        if (actor == ui_selected) { // Is this button pressed down?
-          x++; // Pressed buttons are moved one pixel right and down for uber visual effect ;)
-          y++;
-        }
-        CTX.drawImage(actor.i, r[0], r[1], r[2], r[3], x, y, r[2], r[3]); // Draw the image to the display
+        y = actor.y,
+        o = 0;
+
+        if (ui_selected == actor) o = 1; // Pressed buttons are moved one pixel right and down for uber visual effect ;)
+
+        CTX.drawImage(actor.i, r[0], r[1], r[2], r[3], x + o, y + o, r[2], r[3]); // Draw the image to the display
       }
     }
     CTX.restore(); // Restore context state
@@ -2784,7 +2791,6 @@ onEnterFrame = () => {
                 0 // Frames
               );
 
-
               if (playerLife < PLAYER_MAX_LIFE) { // Add a life point if player life is less than max
                 playerLife ++; // add life
                 lifeImage.oX = playerLife * 72; // Set atlas x offset
@@ -2797,7 +2803,7 @@ onEnterFrame = () => {
               // Check if the wave completed condition is met (all citizens rescued)
               // 
   
-              rescuedCount += 1; // Add one to the number of rescued citizens
+              rescuedCount ++; // Add one to the number of rescued citizens
               rescuedLabel.label = `${rescuedCount}/${citizenCount}`; // Update displayed number of rescued citizens
               if (rescuedCount == citizenCount) { // Have all citizens been rescued?
   
@@ -2858,7 +2864,7 @@ onEnterFrame = () => {
 
                 if (playerLife <= 0) {
 
-                  // DEBUG= 0; // Disable debug output
+                  DEBUG= 0; // Disable debug output
 
                   fx_play(FX_GAME_OVER);
 
@@ -2885,6 +2891,7 @@ onEnterFrame = () => {
                   // 
 
                   disableEverything();
+
                   let dummy = getActor(ROLE_IMAGE)
                   setPosition(dummy, PLAYER.x, PLAYER.y);
                   dummy.eE = 5;
@@ -2917,7 +2924,7 @@ onEnterFrame = () => {
     if (playerCanFire) { // Can the player fire?
       if (playerFiring) { // Only fire if the SPACE key is being held
         playerReloadCounter = PLAYER_RELOAD_DURATION; // Set reload delay
-        playerCanFire= 0; // Set player reloading
+        playerCanFire = 0; // Set player reloading
 
         // Spawn a new player bullet at the players coordinates, moving in the direction that the player is facing
         let bullet = getActor(ROLE_BULLET); // Create a new player bullet actor
@@ -3091,10 +3098,7 @@ onEnterFrame = () => {
           // All enemy bullets just travel in a straight line at their velocity until they expire, or collide with the player
           applyVelocities(actor);
 
-//          console.log(actor);
-
           if (actor.t == ET_MISSILE) {
-            console.log(actor.gpc);
             newParticle(
               .1, // ttl
               actor.x - 1 + rInt(2), // x
@@ -3271,7 +3275,7 @@ onEnterFrame = () => {
 
     for (let i = 0; i < OUT.length; i++) { // Process all actors
       actor = OUT[i];
-      if (actor.r <= ROLE_TEXTFIELD) { // Actors with roles lower than ROLE_TEXTFIELD are considered HUD elements and will always be drawn
+      if (actor.r <= ROLE_BUTTON) { // Actors with roles lower than ROLE_BUTTON are considered HUD elements and will always be drawn
         renderList.push(actor); // Always add these
         
       } else {
@@ -3350,24 +3354,23 @@ onEnterFrame = () => {
   // 
 
   if (transitioning) { // Is the application transitioning between scenes?
-    if (transitioningIn) {
+    
+    if (transitionDirection) {
       if ((transitionAlpha -= DT * 2) <= 0) { // Is the vignette fully transparent?
         transitionAlpha = 0; // Set transparent
         transitionComplete(); // Call code
       }
     } else { // Transitioning out
-      transitionAlpha += DT * 2; // Make the vignette less transparent
-      if (transitionAlpha >= 1) { // Is the vignette fully solid?
+      if ((transitionAlpha += DT * 2) >= 1) { // Is the vignette fully solid?
         transitionAlpha = 1; // Set solid
         transitionComplete(); // Call code
       }
     }
-  }
+  } 
 
   // if (DEBUG) {
   //   debugLabel.label = `out:${OUT.length}`;
   // }
-  
   
   requestAnimationFrame(onEnterFrame); // Request the next EnterFrame event
 };
@@ -3401,20 +3404,19 @@ generateAssets();
 // 
 
 SCORES = loadLocalFile('s'); // Load the scores from local storage
-(!SCORES) ? resetHighScores() : SCORES = JSON.parse(SCORES)
+(!SCORES) ? resetHighScores() : SCORES = JSON.parse(SCORES);
 
 // 
 // Load options from local storage. If they don't exist... create them
 // 
 
 OPTIONS = loadLocalFile('o');
-(!OPTIONS) ? resetOptions() : OPTIONS = JSON.parse(OPTIONS)
+(!OPTIONS) ? resetOptions() : OPTIONS = JSON.parse(OPTIONS);
 
 // 
 // Create sound effects
 // 
 
-// fx_add([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]); // FX_NONE
 fx_add([.05,  1902,0,.16,0,4,1.15,8.9,0,0,0,0,0,0,.4,0,1,.12,0]); // FX_THRUST
 fx_add([2,    345,.07,.04,.62,0,1.95,5.7,0,-75,0,.13,0,0,.1,.15,.59,.05,.23]); // FX_RESCUED
 fx_add([2,    645,.08,.12,.91,2,1.74,2.2,0,0,.1,.12,0,0,.1,.08,.97,.01,.26]); // FX_WAVE_BEGIN
@@ -3430,7 +3432,7 @@ fx_add([.5,   461,.01,.02,.07,4,.29,-2.4,-0.8,0,0,0,0,0,0,.04,.92,.03,0]); // FX
 fx_add([1,    92,.02,.03,.01,1,2.3,57,16,46,.04,.02,0,-2.9,0,0,.22,.04,0]); // FX_CLICK
 fx_add([1,    146,.03,.34,.54,0,.86,0,-9.9,149,.03,.03,0,0,0,0,.65,.02,0]); // FX_SWARM_WARNING
 fx_add([2,    114,.06,.49,.39,2,1.33,.9,7.2,-283,.06,.1,0,18,0,.11,.55,.09,0]); // FX_GAME_OVER
-fx_add([1.3,  93,.05,.07,.08,3,1.57,-1.3,0,0,0,0,0,0,.1,.02,.74,.04,.5]); // FX_MISSILE
+fx_add([1,  93,.05,.07,.08,3,1.57,-1.3,0,0,0,0,0,0,.1,.02,.74,.04,.5]); // FX_MISSILE
 fx_add([1,    593,.06,.03,.91,2,1.27,0,0,27,.06,0,0,47,.1,0,.64,.07,.26]); // FX_AGGRESSOR_ALERT
 fx_add([1,    353,0,0,.32,2,2.32,-0.2,-1.5,0,0,0,.5,-6.9,.1,0,.8,.08,.04]); // FX_ERROR
 fx_add([1.7,  428,0,0,.24,4,1.11,8.7,-1.6,0,0,0,.6,0,.2,.02,.65,.09,.07]); // FX_HIT
@@ -3446,7 +3448,7 @@ for (let t = 0; t < 144; t++) { // Generate this many stars (must be evenly divi
 // 
 // Create the player
 // 
-  
+
 PLAYER = newActor();
 PLAYER.r = ROLE_PLAYER;
 PLAYER.cR = 6;
@@ -3469,12 +3471,16 @@ W.onresize = () => {
 // Install input handlers
 // 
 
-W.onkeyup = keyUp;
-W.onkeydown = keyDown;
+// D.addEventListener('keydown', keyDown);
+// D.addEventListener('keyup', keyUp);
+// D.addEventListener('mousedown', ui_mouseDown);
+// D.addEventListener('mouseup', ui_mouseUp);
 
-W.onmousedown = ui_mouseDown;
-W.onmouseup = ui_mouseUp;
-W.onmousemove = () => {showCursor(1)};
+D.onkeyup = keyUp;
+D.onkeydown = keyDown;
+D.onmousedown = ui_mouseDown;
+D.onmouseup = ui_mouseUp;
+D.onmousemove = () => {showCursor(1)};
 
 // 
 // Reset the pool, which basically recreates it

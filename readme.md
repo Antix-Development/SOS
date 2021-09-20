@@ -64,4 +64,11 @@ First and foremost I must humbly apologize for the state of the SOS code-base. D
 
 On the plus side, I'm always more than happy to answer any questions you might have regarding the code, just drop me a line at antix.development@gmail.com :)
 
+<br>
+
+### BE AWARE...
+**The main code-base contains a few small features (bugs if you must) that do not prevent the game from working, but exist in any case.**
+
+**The extended code-base found in "src/after js13k/" has all issues resolved and also includes added functionality. The main code-base is left purely for js13k competition requirements.**
+
 </div>

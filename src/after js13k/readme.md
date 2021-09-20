@@ -71,12 +71,12 @@ It might be worth investigating whay it fails so terribly in Chrome as I think I
 
 - Added code in `generateBackground()` to recolor the background tiles using a random Hue, set saturation, and set ligntness.
 
-- Disabled debug view.
-
 - Changed all occurences of `null` and `false` to `0`, and `true` to `1` since `true/false` checks evaluate correctly with those values. It also uses  loads less code.
 
-- Compressed zip file is now 13,296 bytes, still within js13k constraints.
+- Resolved an issue where actors with `ROLE_BUTTON` were not being added to the `renderList`.
 
-- Still no luck with RoadRoller which I can accept but it is mildly annoying since the zip file becomes 12,093 bytes using the roadrolled code and I'm sure I could re-enable the debug code (because I like it) and add another control, the BTFU button for quick reverse thrusting.
+- Abandoning hopes of getting the code-base compressed further using RoadRoller as it just does not work in Chrome after being road-rolled. I'm going to chalk this one up to some odd behavior of Chrome since Firefox has no problems with the road-rolled code.
+
+- Totally giving up on working within the js13k competition constraints because the competition has ended, and I want to add a few features tat just can't work within said constraints ;)
 
 </div>
