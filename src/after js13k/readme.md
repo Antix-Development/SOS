@@ -79,4 +79,12 @@ It might be worth investigating whay it fails so terribly in Chrome as I think I
 
 - Totally giving up on working within the js13k competition constraints because the competition has ended, and I want to add a few features tat just can't work within said constraints ;)
 
+**21/9/2021**
+
+- Cheval no longer produces extraneous particles on expiry.
+
+- Buttons are now 20 pixels high to make room on the options menu for more buttons.
+
+- Added a new control for aplying reverse thrusting.
+
 </div>

@@ -45,7 +45,6 @@ NAMESPACE = 'com.antix.sos.', // Namespace for localstorage operations
 
 OPTIONS,
 optionsChanged, // True if the player changed an option
-optionsMenu,
 
 audioEnabledButton,
 
@@ -56,11 +55,13 @@ CONTROL_LEFT = 0, // Values for controlIndex
 CONTROL_RIGHT = 1,
 CONTROL_THRUST = 2,
 CONTROL_FIRE = 3,
+CONTROL_REVERSE = 4,
 
 controlLeftButton, //Button pointers
 controlRightutton,
 controlThrustButton,
 controlFireButton,
+controlReverseButton,
 controlButton,
 
 // mainMenu,
@@ -208,14 +209,15 @@ PLAYER_BULLET_TTL = .75,
 PLAYER_MAX_LIFE = 9,
 
 PLAYER, // The player!!!
-playerRotating= 0, // True if the player is rotating
-playerThrusting= 0, // True if the player is applying an thrust impulse in the direction it is facing
+playerRotating = 0, // True if the player is rotating
+playerThrusting = 0, // True if the player is applying a thrust impulse in the direction it is facing
 playerThrustDelay = 0, // counter to stop too many particles being generated
+playerReversing = 0, // True if the player is applying negative thrust impulse in the direction it is facing
 playerReloadCounter = 0, // Countdown till player able to fire again
-playerCanFire= 0, // True of the player can fire
-playerFiring= 0, // True if the SPACE key is being held
+playerCanFire = 0, // True of the player can fire
+playerFiring = 0, // True if the SPACE key is being held
 playerScore, // Player score
-playerScoreChanged= 0, // If true, the player score label will be updated this frame
+playerScoreChanged = 0, // If true, the player score label will be updated this frame
 scoreLabel, // HUD element showing player score
 playerLife, // How much life the player has. When life reaches zero... it's game over baby!
 lifeImage, // HUD element showing life remaining
@@ -294,7 +296,7 @@ TR_200                = 30,
 // Texture region descriptors (coordinates and dimensions of sub images inside the main atlas).
 // Each descriptor consists of [x, y, width, height]
 textureRegions = [
-  [304, 32, 6, 24],     //  0 3-patch button left
+  [304, 32, 5, 20],     //  0 3-patch button left
   [512, 0, 214, 91],    //  1 Logo
   [392, 48, 8, 8],      //  2 Thrust
   [0, 248, 72, 8],      //  2 Life indicator
@@ -817,13 +819,17 @@ resetOptions = () => {
         k: 190,
         c: 'Period'
       },
-      { // Thrust
+      { // Forward thrust
         k: 17,
         c: 'ControlLeft'
       },
       { // Fire
         k: 32,
         c: 'Space'
+      },
+      { // Reverse thrust
+        k: 16,
+        c: 'ShiftLeft'
       },
     ]
   };
@@ -1261,15 +1267,18 @@ newImage = (x, y, region) => {
 setButtonLabel = (button, label) => {
   button.label = label;
   let r = getTextureRegion(TR_BUTTON); // Get 3-patch button textureRegion
-  button.ctx.drawImage(ATLAS, r[0] + 6,r[1], 1,24, 6,0, button.w-12,24); // Fill middle bit
-  ui_renderString(floor((button.w - ui_strWidth(button.label)) / 2), floor((24 - fontDescriptor.h) / 2) + 1, button.label, button.ctx); // Render the string into the canvas
+  button.ctx.drawImage(ATLAS, r[0] + BUTTON_END_WIDTH,r[1], 1,BUTTON_HEIGHT, BUTTON_END_WIDTH,0, button.w - (BUTTON_END_WIDTH * 2), BUTTON_HEIGHT); // Fill middle bit
+  ui_renderString(floor((button.w - ui_strWidth(button.label)) / 2), floor((BUTTON_HEIGHT - fontDescriptor.h) / 2) + 1, button.label, button.ctx); // Render the string into the canvas
 },
+BUTTON_HEIGHT = 20,
+BUTTON_END_WIDTH = 5,
+
 // Create a new button at the given coordinates with the given label, that executes the given callback code when it is clicked
 newButton = (x, y, w, s, callback) => {
   let button = getActor(ROLE_BUTTON), // Create the button actor
 
   r = getTextureRegion(TR_BUTTON), // Get 3-patch button textureRegion
-  canvas = newCanvas(w, 24), // Create a new canvas
+  canvas = newCanvas(w, BUTTON_HEIGHT), // Create a new canvas
   ctx = canvas.ctx; // Get drawing context
 
   setPosition(button, x, y); // Set coordinates
@@ -1278,7 +1287,7 @@ newButton = (x, y, w, s, callback) => {
 
   button.i = canvas; // Save canvas for drawing
   button.w = w; // Save dimensions
-  button.h = 24;
+  button.h = BUTTON_HEIGHT;
 
   button.label = s;
 
@@ -1286,12 +1295,12 @@ newButton = (x, y, w, s, callback) => {
 
   setTextureRegion(button, [0, 0, w, 24]); // Create and save a textureRegion
 
-  ctx.drawImage(ATLAS, r[0],r[1], 6,24, 0,0, 6,24); // Draw left button bit...
-  ctx.drawImage(ATLAS, r[0] + 6,r[1], 1,24, 6,0, w-12,24); // Middle button bit...
+  ctx.drawImage(ATLAS, r[0],r[1], BUTTON_END_WIDTH,BUTTON_HEIGHT, 0,0, BUTTON_END_WIDTH,BUTTON_HEIGHT); // Draw left button bit...
+  ctx.drawImage(ATLAS, r[0] + BUTTON_END_WIDTH,r[1], 1,BUTTON_HEIGHT, BUTTON_END_WIDTH,0, w-(BUTTON_END_WIDTH * 2),BUTTON_HEIGHT); // Middle button bit...
 
   setButtonLabel(button, s); // Draw middle bit and draw label
 
-  ctx.drawImage(ATLAS, r[0] + 7,r[1], 6,24, w-6, 0, 6,24); // And right button bit
+  ctx.drawImage(ATLAS, r[0] + 7,r[1], BUTTON_END_WIDTH,BUTTON_HEIGHT, w-BUTTON_END_WIDTH, 0, BUTTON_END_WIDTH,BUTTON_HEIGHT); // And right button bit
   // ui_renderString(floor((w - ui_strWidth(s)) / 2), floor((24 - fontDescriptor.h) / 2) + 1, s, ctx); // Render the string into the canvas
 
   BUTTONS.push(button); // Add to list of buttons that can be clicked
@@ -1826,7 +1835,7 @@ changeMenu = (callback) => {
 },
 // Create a button that causes the application to go to the main menu
 mainMenuButton = () => {
-  newButton(64, 215, 128, 'Main Menu', () => { // Main menu button
+  newButton(64, 219, 128, 'Main Menu', () => { // Main menu button
     if (newHigh) { // Was there a new high score?
       saveScores(); // Save high scores
       newHigh = 0; // Set state to no new high score
@@ -1931,43 +1940,49 @@ optionsMenu = () => {
 
   (OPTIONS.a) ? label = ON_LABEL : label = OFF_LABEL; // Determine which label should be printed
 
-  newCenteredTextField(OPTIONS_LABEL, 15, 3); // Create menu title
+  newCenteredTextField(OPTIONS_LABEL, 11, 3); // Create menu title
 
-  newTextField('Sound Effects', 32, 47);
-  audioEnabledButton = newButton(136, 40, 80, label, () => {
+  newTextField('Sound Effects', 32, 39);
+  audioEnabledButton = newButton(136, 32, 80, label, () => {
     OPTIONS.a = !OPTIONS.a;
     (OPTIONS.a) ? setButtonLabel(audioEnabledButton, ON_LABEL) : setButtonLabel(audioEnabledButton, OFF_LABEL);
     fx_play(FX_CLICK);
     optionsChanged = 1;
   });
 
-  newTextField('Rotate Left', 32, 75);
-  controlLeftButton = newButton(16, 87, 104, OPTIONS.c[CONTROL_LEFT].c, () => {
+  newTextField('Rotate Left', 32, 59);
+  controlLeftButton = newButton(16, 71, 104, OPTIONS.c[CONTROL_LEFT].c, () => {
     initializeControkKeyRemap(CONTROL_LEFT, controlLeftButton);
   });
 
-  newTextField('Rotate Right', 150, 75);
-  controlRightButton = newButton(136, 87, 104, OPTIONS.c[CONTROL_RIGHT].c, () => {
+  newTextField('Rotate Right', 150, 59);
+  controlRightButton = newButton(136, 71, 104, OPTIONS.c[CONTROL_RIGHT].c, () => {
     initializeControkKeyRemap(CONTROL_RIGHT, controlRightButton);
   });
 
-  newTextField('Apply Thrust', 30, 124);
-  controlThrustButton = newButton(16, 136, 104, OPTIONS.c[CONTROL_THRUST].c, () => {
+  newTextField('Forward Thrust', 30, 98);
+  controlThrustButton = newButton(16, 110, 104, OPTIONS.c[CONTROL_THRUST].c, () => {
     initializeControkKeyRemap(CONTROL_THRUST, controlThrustButton);
   });
 
-  newTextField('Fire Cheval', 152, 124);
-  controlFireButton = newButton(136, 136, 104, OPTIONS.c[CONTROL_FIRE].c, () => {
+  newTextField('Fire Cheval', 152, 98);
+  controlFireButton = newButton(136, 110, 104, OPTIONS.c[CONTROL_FIRE].c, () => {
     initializeControkKeyRemap(CONTROL_FIRE, controlFireButton);
   });
 
-  newButton(16, 175, 104, 'Reset Options', () => { // Reset options button
+  newTextField('Reverse Thrust', 30, 137);
+  controlReverseButton = newButton(16, 149, 104, OPTIONS.c[CONTROL_REVERSE].c, () => {
+    initializeControkKeyRemap(CONTROL_REVERSE, controlReverseButton);
+  });
+
+
+  newButton(16, 183, 104, 'Reset Options', () => { // Reset options button
     fx_play(FX_CLICK);
     resetOptions();
     changeMenu(optionsMenu); // Go to the options menmu
   });
   
-  newButton(136, 175, 104, 'Reset Scores', () => { // Reset high scores button
+  newButton(136, 183, 104, 'Reset Scores', () => { // Reset high scores button
     fx_play(FX_CLICK);
     resetHighScores();
   });
@@ -2219,18 +2234,22 @@ keyDown = (e) => {
 
     let k = e.keyCode; // Get the key that was pressed or held down
 
-    if ((k == 37) || (k == OPTIONS.c[CONTROL_LEFT].k)) { // Left arrow or a
+    if ((k == 37) || (k == OPTIONS.c[CONTROL_LEFT].k)) { // Left arrow or user configured key
       PLAYER.rR = -PLAYER_TURN_SPEED;
 
-    } else if ((k == 39) || (k == OPTIONS.c[CONTROL_RIGHT].k)) { // Right arrow or d
+    } else if ((k == 39) || (k == OPTIONS.c[CONTROL_RIGHT].k)) { // Right arrow or user configured key
 
       PLAYER.rR = PLAYER_TURN_SPEED;
 
-    } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // "CTRL"
+    } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // User configured key
 
       playerThrusting = 1; // Player wants to thrust
     
-    } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // "SPACE"
+    } else if ((k == 40) || (k == OPTIONS.c[CONTROL_REVERSE].k)) { // Down arrow or user configured key
+
+      playerReversing = 1; // Player wants to reverse
+
+    } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // User configured key
 
       playerFiring = 1; // Player wants to fire
 
@@ -2247,16 +2266,21 @@ keyUp = (e) => {
     // Process keyup events when the game is running
     // 
 
-    if ((k == 37) || (k == OPTIONS.c[CONTROL_LEFT].k) || (k == 39) || (k == OPTIONS.c[CONTROL_RIGHT].k)) { // Left arrow, a, right arrow, d
+    if ((k == 37) || (k == OPTIONS.c[CONTROL_LEFT].k) || (k == 39) || (k == OPTIONS.c[CONTROL_RIGHT].k)) { // Left arrow, right arrow, or user configured keys
 
       PLAYER.rR = 0; // Stop player rotating
 
-    } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // "CTRL"
+    } else if (k == OPTIONS.c[CONTROL_THRUST].k) { // User configured key
 
       playerThrusting = 0; // Stop player thrusting
       playerThrustDelay = 0;
 
-    } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // "SPACE"
+    } else if ((k == 40) || (k == OPTIONS.c[CONTROL_REVERSE].k)) { // Down arrow or user configured key
+
+      playerReversing = 0; // Stop player reversing
+      playerThrustDelay = 0;
+
+    } else if (k == OPTIONS.c[CONTROL_FIRE].k) { // User configured key
 
       playerFiring = 0;
 
@@ -2950,9 +2974,16 @@ onEnterFrame = () => {
 
     PLAYER.rot += PLAYER.rR * DT; // Update player rotation
 
-    if (playerThrusting) { // Is the player thrusting?
-      PLAYER.vX = clamp(PLAYER.vX + cos(PLAYER.rot * DEGTORAD) * 4, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY); // Increment velocity in the direction that the player is facing
-      PLAYER.vY = clamp(PLAYER.vY + sin(PLAYER.rot * DEGTORAD) * 4, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
+    if (playerThrusting || playerReversing) {
+      let multiplier = 1,
+      m2 = 1;
+      if (playerReversing) {
+        multiplier = -.5;
+        m2 = -1;
+      }
+      
+      PLAYER.vX = clamp(PLAYER.vX + cos(PLAYER.rot * DEGTORAD) * (4 * multiplier) , -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY); // Increment velocity in the direction that the player is facing
+      PLAYER.vY = clamp(PLAYER.vY + sin(PLAYER.rot * DEGTORAD) * (4 * multiplier), -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
 
       if ((playerThrustDelay -= DT) < 0) { // Spawn thrust particles at regular intervals
         playerThrustDelay = 0.025; // Time between thrust particle emissions
@@ -2960,19 +2991,48 @@ onEnterFrame = () => {
           .35, // ttl
           PLAYER.x - 2 + rInt(4), // x
           PLAYER.y - 2 + rInt(4), // y
-          PLAYER.rot + 180, // direction
-          150, // speed
+          PLAYER.rot + 180 * m2, // direction
+          150 * m2, // speed
           1, // fades
           1, // alpha
           1, // shrinks
-          1, // scale
+          1 * multiplier, // scale
           0, // rotRate
           getTextureRegion(TR_THRUST), // TextureRegion
           0 // Frames
         );
         fx_play(FX_THRUST);
       }
+
+
     }
+    // if (playerReversing) { // Is the player reversing?
+    //   PLAYER.vX = clamp(PLAYER.vX + cos(PLAYER.rot * DEGTORAD) * -8, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY); // Increment velocity in the direction that the player is facing
+    //   PLAYER.vY = clamp(PLAYER.vY + sin(PLAYER.rot * DEGTORAD) * -8, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
+
+    // } else if (playerThrusting) { // Is the player thrusting?
+    //   PLAYER.vX = clamp(PLAYER.vX + cos(PLAYER.rot * DEGTORAD) * 4, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY); // Increment velocity in the direction that the player is facing
+    //   PLAYER.vY = clamp(PLAYER.vY + sin(PLAYER.rot * DEGTORAD) * 4, -PLAYER_MAX_VELOCITY, PLAYER_MAX_VELOCITY);
+
+    //   if ((playerThrustDelay -= DT) < 0) { // Spawn thrust particles at regular intervals
+    //     playerThrustDelay = 0.025; // Time between thrust particle emissions
+    //     newParticle(
+    //       .35, // ttl
+    //       PLAYER.x - 2 + rInt(4), // x
+    //       PLAYER.y - 2 + rInt(4), // y
+    //       PLAYER.rot + 180, // direction
+    //       150, // speed
+    //       1, // fades
+    //       1, // alpha
+    //       1, // shrinks
+    //       1, // scale
+    //       0, // rotRate
+    //       getTextureRegion(TR_THRUST), // TextureRegion
+    //       0 // Frames
+    //     );
+    //     fx_play(FX_THRUST);
+    //   }
+    // }
     moveAndConstrain(PLAYER); // Update the players world position, and keep them from leaving the game worlds defined boundaries
 
     doFlash(PLAYER); // Flash the player if it is flashing

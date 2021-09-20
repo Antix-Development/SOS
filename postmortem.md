@@ -280,7 +280,7 @@ Given more time (my new catch-phrase) I would..
 
 - Enhance the `textField` actor to handle scaled rendering and possibly multiple lines.
 
-- Add a one pixel padding to all graphics so they don;t get little edge artifacts when drawn rotated (did you notice they do that?).
+- Add a one pixel padding to all graphics so they don't get little edge artifacts when drawn rotated (did you notice they do that?).
 
 Anyhoo, thanks for reading my postmortem and I hope that you can decipher a bit of my code and will maybe learn something new that you can leverage in your own projects.
 
