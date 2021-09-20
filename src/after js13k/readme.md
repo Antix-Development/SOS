@@ -75,7 +75,7 @@ It might be worth investigating whay it fails so terribly in Chrome as I think I
 
 - Resolved an issue where actors with `ROLE_BUTTON` were not being added to the `renderList`.
 
-- Abandoning hopes of getting the code-base compressed further using RoadRoller as it just does not work in Chrome after being road-rolled. I'm going to chalk this one up to some odd behavior of Chrome since Firefox has no problems with the road-rolled code.
+- Abandoning hopes of getting the code-base compressed further using RoadRoller as it just does not work in Chrome after being road-rolled. I'm going to chalk this one up to some odd behavior of Chrome since Firefox has no problems with the road-rolled code. Next year I'll road-roll from the get go which will make it easier to find Chrome specific issues.
 
 - Totally giving up on working within the js13k competition constraints because the competition has ended, and I want to add a few features tat just can't work within said constraints ;)
 
