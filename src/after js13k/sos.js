@@ -2000,7 +2000,7 @@ mainMenu = () => {
     transition(1, () => { // Execute this code when the scene has transtioned out
       BUTTONS = [];
       WAVE = 0; // Reset the attack wave
-      playerScore = 70000; // Reset the players score
+      playerScore = 0; // Reset the players score
 
       starColors = starPalettes[0]; // Set ingame star colors
 
