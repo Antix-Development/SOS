@@ -1815,7 +1815,6 @@ nextWave = () => {
 },
 // #endregion
 
-
 // #region User Interfaces
 // Fade the menu in, enable button clicking, and show the mouse pointer
 showMenu = () => {
@@ -1824,7 +1823,7 @@ showMenu = () => {
     showCursor(1);
   });
 },
-// Fade the diaplsy out, then initialize the required menu (execute its initialization code)
+// Fade the display out, then initialize the required menu (execute its initialization code)
 changeMenu = (callback) => {
   fx_play(FX_CLICK); // Click!
   transition(1, () => {
