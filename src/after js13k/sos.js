@@ -848,8 +848,7 @@ addNewScore = (name, score) => {
 
   SCORES.push(newScore); // Append the new score to the list
 
-  SCORES.sort(function poop(a, b) {return a.s < b.s}); // Sort
-  // SCORES.sort((a, b) => (a.s < b.s)  ? 1 : -1); // Sort
+  SCORES.sort((a, b) => (a.s < b.s)  ? 1 : -1); // Sort
   
   SCORES.length = 5; // Nasty truncation
   return newScore; // Required for highscore checking
@@ -2001,7 +2000,7 @@ mainMenu = () => {
     transition(1, () => { // Execute this code when the scene has transtioned out
       BUTTONS = [];
       WAVE = 0; // Reset the attack wave
-      playerScore = 0; // Reset the players score
+      playerScore = 70000; // Reset the players score
 
       starColors = starPalettes[0]; // Set ingame star colors
 
